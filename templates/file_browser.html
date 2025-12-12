@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>File Browser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 10px 90px; /* 上下 10px，左右 200px */
+        }
+        .file-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .file-list li {
+            background-color: #fff;
+            margin: 5px 0;
+            padding: 10px 30px; /* 上下 10px，左右 200px */
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .file-list li:nth-child(odd) {
+            background-color: #e9ecef; /* 明暗交替效果 */
+        }
+        .file-name a {
+            text-decoration: none;
+            color: #007BFF;
+            align-items: center;
+            display: inline-flex;
+        }
+        .file-name a:hover {
+            text-decoration: underline;
+        }
+        .file-actions a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .file-actions a:hover {
+            text-decoration: underline;
+        }
+        .icon {
+            margin-right: 10px;
+            color: #FF0000; /* 红色 */
+        }
+       
+    </style>
+</head>
+<body>
+   <h2>Files in {{ curr_path }}</h2>
+  
+   <div style="display: flex; justify-content: flex-end;">
+ {% if session['username'] == 'root' %}
+       <a href="{{ url_for('add_user') }}" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; text-align: center;"> Add User</a>
+   {% endif %}
+       <a href="{{ url_for('logout') }}" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; text-align: center;"> Logout </a>
+   </div>
+    <ul class="file-list">
+        {% for item in items %}
+            <li>
+                <div class="file-name">
+                    <span class="icon">
+                        {% if item.is_dir %}
+                            🗂️ <!-- 目录图标 -->
+                        {% else %}
+                            📄 <!-- 文件图标 -->
+                        {% endif %}
+                    </span>
+                    <a href="{{ url_for('file_preview', filename=curr_path+'/'+item.name) }}" target="_self">{{ item.name }}</a>
+                </div>
+                <div class="file-actions">
+                    {% if not item.is_dir %}
+                        <a href="{{ url_for('download_file', filename=curr_path+'/'+item.name) }}">Download</a>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
