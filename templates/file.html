@@ -282,11 +282,11 @@
 <body>
     <!-- 遮罩层 -->
     <div class="overlay" id="overlay" onclick="toggleHelp()"></div>
-    
+
     <div class="container">
         <div class="header">
             <h1>文件浏览器</h1>
-            
+
             <!-- 右下角的下载建议按钮 -->
             <div class="download-help" id="downloadHelp">
                 <div class="download-help-header" onclick="toggleHelp()">
@@ -308,7 +308,7 @@
 wget -c --tries=5 --retry-connrefused --waitretry=10 --timeout=300 --read-timeout=600 "http://your-server/path/to/file.tar.gz"
                         </div>
                     </div>
-                    
+
                     <div class="method-card">
                         <div class="method-title">
                             <span>🚀 curl 标准版 - 支持断点续传，自动提取文件名</span>
@@ -318,7 +318,7 @@ wget -c --tries=5 --retry-connrefused --waitretry=10 --timeout=300 --read-timeou
 curl -L -C - -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://your-server/path/to/file.tar.gz"
                         </div>
                     </div>
-                    
+
                     <div class="method-card">
                         <div class="method-title">
                             <span>💻 Windows CMD 兼容版</span>
@@ -365,9 +365,9 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
         }
 
         // 初始化基础路径
-        currentBasePath = detectBasePath();
+        currentBasePath = window.location.pathname;
         console.log('Initialized base path:', currentBasePath); // 打印初始化的基础路径
-
+        ShowHideFile  = true
         // 格式化文件大小
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 B';
@@ -389,7 +389,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
             if (isDir) {
                 return '📁';
             }
-            
+
             const ext = fileName.split('.').pop().toLowerCase();
             const iconMap = {
                 'txt': '📄',
@@ -416,30 +416,30 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 'avi': '🎬',
                 'mov': '🎬'
             };
-            
+
             return iconMap[ext] || '📄';
         }
 
         // 从 URL 获取当前路径
         function getCurrentPathFromURL() {
             let path = window.location.pathname;
-            
+
             // 如果有基础路径，移除它
             if (currentBasePath && path.startsWith(currentBasePath)) {
                 path = path.substring(currentBasePath.length);
             }
-            
+
             // 移除开头的 /
             if (path.startsWith('/')) {
                 path = path.substring(1);
             }
-            
+
             return path;
         }
 
         // 更新 URL 但不刷新页面
         function updateURL(path) {
-            const url = currentBasePath + (path ? `/${path}` : '/');
+            const url = path;
             window.history.pushState({ path: path }, '', url);
         }
 
@@ -478,12 +478,12 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
         // 加载文件列表
         async function loadFiles(path) {
+            console.log(`loadFiles:${path}`);
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '<div class="loading">正在加载...</div>';
-
-            console.log(`loadFiles:${path}`);
             try {
-                const response = await fetch(`/data_req/${path}`);
+            console.log(`loadFiles:${path}`);
+            const response = await fetch(`${path}`, {method:'PUT'});
                 const data = await response.json();
 
                 if (data.error) {
@@ -521,57 +521,54 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
                 // 显示文件
                 data.files.forEach(file => {
-                    const fileName = file.key.replace(path, '').replace(/^\/+/, '');
-                    if (fileName) {
-                        // 检查是否是 HTML 文件
-                        const isHtmlFile = fileName.toLowerCase().endsWith('.html');
-                        const downloadAttr = isHtmlFile ? '' : 'download';
-                        html += `
-                            <div class="file-item">
-                                <div class="file-icon">${getFileIcon(fileName, false)}</div>
-                                <a href="/preview/${currentBasePath}/${file.key}" class="file-name" target="_blank" >${fileName}</a>
-                                <div class="file-info">
-                                    <div class="file-size">${formatFileSize(file.size)}</div>
-                                    <div class="file-date">${formatDate(file.lastModified)}</div>
-                                    <button class="osslink-btn" onclick="showOssLinkDialog('${file.key}')" title="生成外网下载链接（仅内网下载异常时使用）">
-                                        <span style="font-size:15px;">🌐</span>
-                                    </button>
-                                </div>
+                const fileName = file.key.replace(path, '').replace(/^\/+/, '');
+                if (fileName && !(fileName.startsWith('.') && !ShowHideFile)) {
+                    html += `
+                        <div class="file-item">
+                            <div class="file-icon">${getFileIcon(fileName, false)}</div>
+                            <a href="${file.key}" class="file-name" target="_blank" >${fileName}</a>
+                            <div class="file-info">
+                                <div class="file-size">${formatFileSize(file.size)}</div>
+                                <div class="file-date">${formatDate(file.lastModified)}</div>
+                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${file.key}')" title="delete file">
+                                    <span style="font-size:15px;">🗑️ </span>
+                                </button>
+                                <button class="osslink-btn" onclick="OnDownload('${file.key}')" title="delete file">
+                                    <span style="font-size:15px;">⬇️</span>
+                                </button>
                             </div>
-                        `;
-                    }
-                });
+                        </div> `;
+                }
+            });
+
+   window.OnDownload = function(file) {
+       const link = document.createElement('a');
+       link.href = file + '?action=download';
+       link.download = file;
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+   }
     // 生成外网下载链接弹窗
-    window.showOssLinkDialog = function(key) {
-        let dialog = document.getElementById('osslink-dialog');
+   window.DeleteConfirmDialog = function(fileKey)  {
+        let dialog = document.getElementById('delete_conform_dialog');
         if (!dialog) {
+            console.info('DeleteConfirmDialog ', fileKey);
             dialog = document.createElement('div');
-            dialog.id = 'osslink-dialog';
+            dialog.id = 'delete_conform_dialog';
+            filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
             dialog.innerHTML = `
                 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:2000;" onclick="closeOssLinkDialog(event)"></div>
-                <form id="osslink-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:32px 24px 24px 24px;border-radius:12px;box-shadow:0 8px 40px rgba(52,152,219,0.18);z-index:2001;min-width:320px;max-width:90vw;">
-                    <div style="display:flex;align-items:center;margin-bottom:16px;">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <h3 style="margin:0;font-size:1.2em;color:#3498db;">生成外网下载链接</h3>
+                <form id="osslink-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:32px 24px 24px 24px;border-radius:12px;box-shadow:0 8px 40px rgba(52,152,219,0.18);z-index:2001;min-width:280px;max-width:90vw;">
+                    <div style="display:flex;justify-content:center;margin-bottom:16px;margin-top:-8px;">
+                <h3 style="margin:0;margin-top: -8px;font-size:1.2em;color:#555555;">⚠️ Delete ${filename} ?</h3>
                     </div>
-                    <div style="background:#f8f9fa;color:#e67e22;font-size:14px;padding:8px 12px;border-radius:6px;margin-bottom:14px;border-left:4px solid #e67e22;">
-                        仅在内网下载异常时使用。外网下载速度取决于公网带宽，链接请勿外泄。
-                    </div>
-                    <input type="hidden" name="key">
-                    <label style="display:block;margin-bottom:8px;">账号：
-                        <input name="username" required style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;">
-                        <a href="https://ldap.xiaopeng.com/" target="_blank" style="margin-left:8px;vertical-align:middle;display:inline-block;" title="如需登录验证或重置账号，点击跳转：https://ldap.xiaopeng.com/">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;cursor:pointer;" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="#3498db" stroke-width="2" fill="#eaf6fd"/>
-                                <line x1="12" y1="8" x2="12" y2="12" stroke="#3498db" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="12" cy="16" r="1.2" fill="#3498db"/>
-                            </svg>
-                        </a>
-                    </label>
-                    <label style="display:block;margin-bottom:8px;">密码：<input name="password" type="password" required style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"></label>
-                    <label style="display:block;margin-bottom:8px;">有效期(小时)：<input name="expire" type="number" min="1" max="24" value="5" required style="width:120px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"></label>
-                    <div style="margin-top:12px;">
-                        <button type="submit" style="background:#3498db;color:#fff;border:none;padding:7px 24px;border-radius:6px;font-size:1em;cursor:pointer;">生成</button>
+
+                    <input type="hidden" name="fileKey">
+                    <label style="display:block;margin-bottom:10px;">账号：<input name="username" style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"> </label>
+                    <label style="display:block;margin-bottom:10px;">密码：<input name="password" type="password" style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"></label>
+                    <div style="display: flex; justify-content: center; margin-top:8px; ">
+                        <button type="submit" style="background:#a22;color:#fff;border:none;padding:7px 24px;border-radius:6px;font-size:1em;cursor:pointer;">删除</button>
                         <button type="button" onclick="closeOssLinkDialog(event)" style="margin-left:12px;background:#eee;color:#333;border:none;padding:7px 18px;border-radius:6px;font-size:1em;cursor:pointer;">取消</button>
                     </div>
                     <div id="osslink-result" style="margin-top:16px;color:#2c3e50;"></div>
@@ -582,49 +579,45 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 e.preventDefault();
                 const form = e.target;
                 const data = {
-                    key: form.key.value,
-                    expire: parseInt(form.expire.value) * 3600, // 小时转秒
+                    key: form.fileKey.value,
                     username: form.username.value,
                     password: form.password.value
                 };
                 const resultDiv = document.getElementById('osslink-result');
                 resultDiv.textContent = '正在请求...';
-                try {
-                    const resp = await fetch(currentBasePath + '/osslink', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(data)
-                    });
-                    let result = null;
-                    let text = await resp.text();
-                    try {
-                        result = JSON.parse(text);
-                    } catch (e) {
-                        // 非JSON，直接显示原文
-                        resultDiv.innerHTML = `<span style='color:#e74c3c;'>${text.trim()}</span>`;
-                        return;
-                    }
-                    if (resp.ok && result.url) {
-                        resultDiv.innerHTML = `<a href="${result.url}" target="_blank">${result.url}</a>`;
+                fetch(`${fileKey}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        //alert('文件已成功删除！');
+                        resultDiv.textContent = '文件已成功删除！';
+                        if (dialog) {
+                            dialog.style.display = 'none'; // 隐藏弹窗，或使用其他方法移除
+                        }
+                        loadFiles(currentPath);
                     } else {
-                        resultDiv.innerHTML = `<span style='color:#e74c3c;'>${(result.error || '认证失败或参数错误')}</span>`;
+                        alert('删除失败，请稍后重试！');
+                        //resultDiv.textContent = '删除失败，请稍后重试！';
                     }
-                } catch (err) {
-                    resultDiv.innerHTML = `<span style='color:#e74c3c;'>请求失败: ${err}</span>`;
-                }
+                })
+                .catch(error => {
+                    alert('网络异常，请检查连接！');
+                    //resultDiv.textContent = '网络异常，请检查连接！';
+                });
             };
         }
         // 赋值
-        document.querySelector('#osslink-form [name="key"]').value = key;
+        document.querySelector('#osslink-form [name="fileKey"]').value = fileKey;
         document.getElementById('osslink-result').textContent = '';
         dialog.style.display = 'block';
     }
 
     window.closeOssLinkDialog = function(e) {
-        if (e && e.target && e.target.id !== 'osslink-dialog' && e.target.closest && !e.target.closest('#osslink-form')) {
-            document.getElementById('osslink-dialog').style.display = 'none';
+        if (e && e.target && e.target.id !== 'delete_conform_dialog' && e.target.closest && !e.target.closest('#osslink-form')) {
+            document.getElementById('delete_conform_dialog').style.display = 'none';
         } else if (!e || (e.target && e.target.type === 'button')) {
-            document.getElementById('osslink-dialog').style.display = 'none';
+            document.getElementById('delete_conform_dialog').style.display = 'none';
         }
     }
 
@@ -662,7 +655,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
         function toggleHelp() {
             const helpDiv = document.getElementById('downloadHelp');
             const overlay = document.getElementById('overlay');
-            
+
             if (helpDiv.classList.contains('expanded')) {
                 // 关闭弹窗
                 helpDiv.classList.remove('expanded');
@@ -682,7 +675,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
             const methodCard = button.closest('.method-card');
             const codeBlock = methodCard.querySelector('.code-block');
             const code = codeBlock.textContent.trim();
-            
+
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(code).then(() => {
                     button.textContent = '已复制!';
