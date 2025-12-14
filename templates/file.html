@@ -425,14 +425,14 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
             let path = window.location.pathname;
 
             // 如果有基础路径，移除它
-            if (currentBasePath && path.startsWith(currentBasePath)) {
-                path = path.substring(currentBasePath.length);
-            }
+            //if (currentBasePath && path.startsWith(currentBasePath)) {
+            //    path = path.substring(currentBasePath.length);
+            //}
 
             // 移除开头的 /
-            if (path.startsWith('/')) {
-                path = path.substring(1);
-            }
+            //if (path.startsWith('/')) {
+            //    path = path.substring(1);
+            //}
 
             return path;
         }
@@ -452,6 +452,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 let currentPathPart = '';
                 parts.forEach((part, index) => {
                     currentPathPart += part + '/';
+                    console.log(`updateBreadcrumb ${currentPathPart}:${path}`);
                     html += ` / <a href=\"#\" onclick=\"navigateWithEvent(event, '${currentPathPart}')\">${part}</a>`;
                 });
             }
@@ -463,13 +464,14 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
         // 导航到指定路径（带事件处理）
         function navigateWithEvent(event, path) {
-            console.log(`navigateWithEvent :${path}`);
+            console.log(`navigateWithEvent path:${path}`);
             event.preventDefault();
             navigate(path);
         }
 
         // 导航到指定路径
         function navigate(path) {
+            console.log(`navigate path:${path}`);
             currentPath = path;
             updateURL(path);
             updateBreadcrumb(path);
@@ -478,12 +480,14 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
         // 加载文件列表
         async function loadFiles(path) {
-            console.log(`loadFiles:${path}`);
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '<div class="loading">正在加载...</div>';
+            console.log(`start ----- loadFiles path:${path}`);
             try {
-            console.log(`loadFiles:${path}`);
-            const response = await fetch(`${path}`, {method:'PUT'});
+                tmp_url = currentBasePath + path
+                const fetch_url = tmp_url.substring(tmp_url.lastIndexOf('/') + 1);
+                console.log(`currentBasePath:${currentBasePath},loadFiles:${path},fetch_url: ${fetch_url}`);
+                const response = await fetch(fetch_url, {method:'PUT'});
                 const data = await response.json();
 
                 if (data.error) {
@@ -502,14 +506,13 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 let dirs = data.directories.slice();
                 if (dirReverse) dirs.reverse();
                 dirs.forEach(dir => {
-                    const dirName = dir.replace(path, '').replace(/^\/+|\/+$/g, '');
-
-                   console.log(`dir:${dir}, dirName:${dirName}, path:${path}`);
-                    if (dirName) {
+                    dir_url = fetch_url+'/'+dir
+                    //console.log(` dir:${dir}, dir_url:${dir_url}`);
+                    if (dir) {
                         html += `
                             <div class="file-item">
-                                <div class="file-icon">${getFileIcon(dirName, true)}</div>
-                                <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dir}')">${dirName}/</a>
+                                <div class="file-icon">${getFileIcon(dir, true)}</div>
+                                <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dir_url}')">${dir}/</a>
                                 <div class="file-info">
                                     <div class="file-size">-</div>
                                     <div class="file-date">-</div>
@@ -521,12 +524,14 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
                 // 显示文件
                 data.files.forEach(file => {
-                const fileName = file.key.replace(path, '').replace(/^\/+/, '');
+                const fileName = file.key;
+                const fileUrl = fetch_url + '/' + fileName;
+                //console.log(` fileUrl:${fileUrl}, fileName:${fileName}`);
                 if (fileName && !(fileName.startsWith('.') && !ShowHideFile)) {
                     html += `
                         <div class="file-item">
                             <div class="file-icon">${getFileIcon(fileName, false)}</div>
-                            <a href="${file.key}" class="file-name" target="_blank" >${fileName}</a>
+                            <a href="${fileUrl}" class="file-name" target="_blank" >${fileName}</a>
                             <div class="file-info">
                                 <div class="file-size">${formatFileSize(file.size)}</div>
                                 <div class="file-date">${formatDate(file.lastModified)}</div>
@@ -552,21 +557,20 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
     // 生成外网下载链接弹窗
    window.DeleteConfirmDialog = function(fileKey)  {
         let dialog = document.getElementById('delete_conform_dialog');
+        const filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
+        console.info('DeleteConfirmDialog ', fileKey);
         if (!dialog) {
-            console.info('DeleteConfirmDialog ', fileKey);
             dialog = document.createElement('div');
             dialog.id = 'delete_conform_dialog';
-            filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
             dialog.innerHTML = `
                 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:2000;" onclick="closeOssLinkDialog(event)"></div>
                 <form id="osslink-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:32px 24px 24px 24px;border-radius:12px;box-shadow:0 8px 40px rgba(52,152,219,0.18);z-index:2001;min-width:280px;max-width:90vw;">
                     <div style="display:flex;justify-content:center;margin-bottom:16px;margin-top:-8px;">
-                <h3 style="margin:0;margin-top: -8px;font-size:1.2em;color:#555555;">⚠️ Delete ${filename} ?</h3>
+                <h3 id="dialog-filename" ""style="margin:0;margin-top: -8px;font-size:1.2em;color:#555555;">⚠️ Delete ${filename} </h3>
                     </div>
-
-                    <input type="hidden" name="fileKey">
-                    <label style="display:block;margin-bottom:10px;">账号：<input name="username" style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"> </label>
+                    <div style="display: flex; justify-content: center; margin-top:8px; ">
                     <label style="display:block;margin-bottom:10px;">密码：<input name="password" type="password" style="width:180px;padding:6px 8px;border:1px solid #ccc;border-radius:5px;"></label>
+                    </div>
                     <div style="display: flex; justify-content: center; margin-top:8px; ">
                         <button type="submit" style="background:#a22;color:#fff;border:none;padding:7px 24px;border-radius:6px;font-size:1em;cursor:pointer;">删除</button>
                         <button type="button" onclick="closeOssLinkDialog(event)" style="margin-left:12px;background:#eee;color:#333;border:none;padding:7px 18px;border-radius:6px;font-size:1em;cursor:pointer;">取消</button>
@@ -575,19 +579,13 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 </form>
             `;
             document.body.appendChild(dialog);
-            document.getElementById('osslink-form').onsubmit = async function(e) {
+        }
+       document.getElementById('osslink-form').onsubmit = async function(e) {
                 e.preventDefault();
                 const form = e.target;
-                const data = {
-                    key: form.fileKey.value,
-                    username: form.username.value,
-                    password: form.password.value
-                };
                 const resultDiv = document.getElementById('osslink-result');
                 resultDiv.textContent = '正在请求...';
-                fetch(`${fileKey}`, {
-                    method: 'DELETE',
-                })
+                fetch(`${filename}`, { method: 'DELETE', })
                 .then(response => {
                     if (response.ok) {
                         //alert('文件已成功删除！');
@@ -606,9 +604,11 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                     //resultDiv.textContent = '网络异常，请检查连接！';
                 });
             };
-        }
         // 赋值
-        document.querySelector('#osslink-form [name="fileKey"]').value = fileKey;
+       const filenameElement = document.getElementById('dialog-filename');
+       if (filenameElement) {
+            filenameElement.textContent = `⚠️ Delete ${filename} ?`;
+        }
         document.getElementById('osslink-result').textContent = '';
         dialog.style.display = 'block';
     }
@@ -637,18 +637,19 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
         // ----------Entry------- 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
-        // 排序按钮事件
-        const sortBtn = document.getElementById('dirSortBtn');
-        if (sortBtn) {
-            sortBtn.onclick = function() {
-                dirReverse = !dirReverse;
-                updateBreadcrumb(currentPath);
-                loadFiles(currentPath);
-            };
-        }
+            // 排序按钮事件
+            const sortBtn = document.getElementById('dirSortBtn');
+            if (sortBtn) {
+                sortBtn.onclick = function() {
+                    console.log(`onclick sort Btn`);
+                    dirReverse = !dirReverse;
+                    updateBreadcrumb(currentPath);
+                    loadFiles(currentPath);
+                };
+            }
             const initialPath = getCurrentPathFromURL();
+            console.log(`exec navigate(${initialPath}) `);
             navigate(initialPath);
-            console.log(`exit DOMContentLoaded`);
         });
 
         // 切换帮助区域显示/隐藏

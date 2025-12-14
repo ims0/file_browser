@@ -39,53 +39,61 @@ def web_entry(url_path):
         app.logger.info(f'web_entry, url:{url_path}')
         action = request.args.get('action')
         filename = os.path.join(BASE_DIR, url_path)
-        if action == 'download':
-            return download_file(filename)
-        elif action == 'preview':
-            return file_preview(filename)
-        else:
-            if os.path.isdir(filename) :
-                return render_template('file.html')
-            elif os.path.isfile(filename):
+        if os.path.exists(filename):
+            if action == 'download':
+                return download_file(filename)
+            elif action == 'preview':
                 return file_preview(filename)
-            else :
-                return jsonify({"error": "Invalid action"}), 400
+            else:
+                if os.path.isdir(filename) :
+                    return render_template('file.html')
+                elif os.path.isfile(filename):
+                    return file_preview(filename)
+                else :
+                    return jsonify({"error": "Invalid action"}), 400
+        else :
+            app.logger.error(f'web_entry, file not found:{filename}')
+            return jsonify({"error": "file is not exist"}), 400
     return redirect(url_for('login'))
 
 # 构建响应数据
 @app.route('/', defaults={'file_path': '/'}, methods=['PUT'])
 @app.route('/<path:file_path>', methods=['PUT'])
 def data_response_put_api(file_path):
-    app.logger.info(f'=== data rsp: {file_path}')
+    app.logger.info(f'=== data request url: {file_path}')
+    response_data = {
+        "directories": [],
+        "files": [],
+    }
     if 'username' not in session:
         print("file_response, file_path arg:", file_path)
-        app.logger.info(f'Not login')
-        response_data = {
-            "directories": [],
-            "files": [],
-        }
         app.logger.info(f'Not login')
         return jsonify(response_data)
     # 指定要列出的目录路径
     if file_path[0] != '/' :
         file_path = '/' + file_path
 
-    directory_path = BASE_DIR + file_path
-    app.logger.info(f"file_response, file_path arg:{directory_path}")
+    dir_path = BASE_DIR + file_path
+
+    if not os.path.isdir(dir_path):
+        app.logger.info(f"dir is not exist:{dir_path}")
+        return jsonify(response_data)
 
     # 初始化目录和文件列表
     directories = []
     files = []
-
     # 遍历目录内容
-    for entry in os.scandir(directory_path):
+    for entry in os.scandir(dir_path):
         #print(entry.path, ":", entry.path.removeprefix(BASE_DIR), "basedir:",BASE_DIR )
+        base_name = os.path.basename(entry.path)
+        if base_name.startswith('.'):
+            continue
         if entry.is_dir():
-            directories.append(entry.path.removeprefix(BASE_DIR))
+            directories.append(base_name)
         elif entry.is_file():
             # 获取文件信息
             file_info = {
-                "key": entry.path.removeprefix(BASE_DIR),
+                "key": base_name,
                 "size": entry.stat().st_size,
                 "lastModified": datetime.utcfromtimestamp(entry.stat().st_mtime).isoformat() + 'Z'
             }
@@ -110,19 +118,17 @@ def delete_route_api(url_path):
             return render_template('file.html')
         else:
             app.logger.error(f'Not found:{url_path}')
+            return render_template('file.html')
     else:
         return redirect(url_for('login'))
 
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python'}
 def file_preview( filename):
     if 'username' in session:
-        print("f:file_preview, filename:", filename)
         if os.path.isdir(filename):
-            print("is dir, display list:", filename)
             items = [{'name': item, 'is_dir': os.path.isdir(filename+'/' + item)} for item in os.listdir(filename)]
             return render_template('file_browser.html', items=items, curr_path=filename)
         elif os.path.isfile(filename):
-            print("is file:", filename)
             suffix = os.path.splitext(filename)[1]
             if suffix in suffix_lang:
                 try:
