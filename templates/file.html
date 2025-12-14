@@ -484,9 +484,9 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
             fileList.innerHTML = '<div class="loading">正在加载...</div>';
             console.log(`start ----- loadFiles path:${path}`);
             try {
-                tmp_url = currentBasePath + path
+                tmp_url =  path
                 const fetch_url = tmp_url.substring(tmp_url.lastIndexOf('/') + 1);
-                console.log(`currentBasePath:${currentBasePath},loadFiles:${path},fetch_url: ${fetch_url}`);
+                console.log(`loadFiles:${path},fetch_url: ${fetch_url}`);
                 const response = await fetch(fetch_url, {method:'PUT'});
                 const data = await response.json();
 
