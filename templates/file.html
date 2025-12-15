@@ -446,10 +446,10 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
         // 更新面包屑导航
         function updateBreadcrumb(path) {
             const inner = document.getElementById('breadcrumb-inner');
-            let html = `<a href="#" onclick="navigateWithEvent(event, '')">根目录</a>`;
+            let html = `<a href="#" onclick="navigateWithEvent(event, '/')">根目录</a>`;
             if (path) {
                 const parts = path.split('/').filter(part => part);
-                let currentPathPart = '';
+                let currentPathPart = '/';
                 parts.forEach((part, index) => {
                     currentPathPart += part + '/';
                     console.log(`updateBreadcrumb ${currentPathPart}:${part}`);
@@ -487,7 +487,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 tmp_url =  path
                 const fetch_url = tmp_url.substring(tmp_url.lastIndexOf('/') + 1);
                 console.log(`loadFiles:${path},fetch_url: ${fetch_url}`);
-                const response = await fetch(fetch_url, {method:'PUT'});
+                const response = await fetch(path, {method:'PUT'});
                 const data = await response.json();
 
                 if (data.error) {
@@ -506,13 +506,14 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 let dirs = data.directories.slice();
                 if (dirReverse) dirs.reverse();
                 dirs.forEach(dir => {
-                    dir_url = fetch_url+'/'+dir
+                    dir_url = path+'/'+dir
+                    dir_url = dir_url.replace(/^\/+/, '/') // hand url startwith //
                     //console.log(` dir:${dir}, dir_url:${dir_url}`);
                     if (dir) {
                         html += `
                             <div class="file-item">
                                 <div class="file-icon">${getFileIcon(dir, true)}</div>
-                                <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dir_url}')">${dir}/</a>
+                                <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dir_url}', false)">${dir}/</a>
                                 <div class="file-info">
                                     <div class="file-size">-</div>
                                     <div class="file-date">-</div>
@@ -525,7 +526,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 // 显示文件
                 data.files.forEach(file => {
                 const fileName = file.key;
-                const fileUrl = fetch_url + '/' + fileName;
+                const fileUrl = path + '/' + fileName;
                 //console.log(` fileUrl:${fileUrl}, fileName:${fileName}`);
                 if (fileName && !(fileName.startsWith('.') && !ShowHideFile)) {
                     html += `
