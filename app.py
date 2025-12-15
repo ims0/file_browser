@@ -117,7 +117,7 @@ def delete_route_api(url_path):
             app.logger.warning(f'Delete: {filename} finish!')
             return render_template('file.html')
         else:
-            app.logger.error(f'Not found:{url_path}')
+            app.logger.error(f'Not found:{filename}')
             return render_template('file.html')
     else:
         return redirect(url_for('login'))

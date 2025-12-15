@@ -452,7 +452,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 let currentPathPart = '';
                 parts.forEach((part, index) => {
                     currentPathPart += part + '/';
-                    console.log(`updateBreadcrumb ${currentPathPart}:${path}`);
+                    console.log(`updateBreadcrumb ${currentPathPart}:${part}`);
                     html += ` / <a href=\"#\" onclick=\"navigateWithEvent(event, '${currentPathPart}')\">${part}</a>`;
                 });
             }
@@ -535,7 +535,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                             <div class="file-info">
                                 <div class="file-size">${formatFileSize(file.size)}</div>
                                 <div class="file-date">${formatDate(file.lastModified)}</div>
-                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${file.key}')" title="delete file">
+                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
                                     <span style="font-size:15px;">🗑️ </span>
                                 </button>
                                 <button class="osslink-btn" onclick="OnDownload('${file.key}')" title="delete file">
@@ -558,7 +558,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
    window.DeleteConfirmDialog = function(fileKey)  {
         let dialog = document.getElementById('delete_conform_dialog');
         const filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
-        console.info('DeleteConfirmDialog ', fileKey);
+        console.info('DeleteConfirmDialog ', filename, fileKey);
         if (!dialog) {
             dialog = document.createElement('div');
             dialog.id = 'delete_conform_dialog';
@@ -585,7 +585,7 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                 const form = e.target;
                 const resultDiv = document.getElementById('osslink-result');
                 resultDiv.textContent = '正在请求...';
-                fetch(`${filename}`, { method: 'DELETE', })
+                fetch(`${fileKey}`, { method: 'DELETE', })
                 .then(response => {
                     if (response.ok) {
                         //alert('文件已成功删除！');
