@@ -131,6 +131,20 @@ def delete_route_api(url_path):
     else:
         return redirect(url_for('login'))
 
+#Upload
+@app.route('/', methods=['POST'])
+def upload_file():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return "No file part"
+        file = request.files['file']
+        if file.filename == '':
+            return "No selected file"
+        if file:
+            file.save(os.path.join(BASE_DIR, file.filename))
+            return "File successfully uploaded"
+    return render_template('file.html')
+
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
 def file_preview( filename):
     if 'username' in session:
