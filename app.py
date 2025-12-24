@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, render_template_string,jsonify
-import json, os, html, logging
+import json, os, html, logging, shutil
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 app = Flask(__name__)
@@ -12,7 +12,7 @@ app.logger.handlers = []
 
 # 创建并添加新的Handler
 handler = logging.StreamHandler()
-formatter = logging.Formatter( '%(asctime)s [%(levelname)s][%(filename)s:%(lineno)d:%(funcName)s]%(message)s')
+formatter = logging.Formatter( '%(asctime)s [%(levelname)s][%(filename)s:%(lineno)d:%(funcName)s] %(message)s')
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
@@ -106,6 +106,12 @@ def data_response_put_api(file_path):
     }
     return jsonify(response_data)
 
+def delete_directory(path):
+    try:
+        shutil.rmtree(path)
+        app.logger.info(f"Successfully deleted the directory: {path}")
+    except Exception as e:
+        app.logger.info(f"Error: {e}")
 # DELETE
 @app.route('/<path:url_path>', methods=['DELETE'])
 def delete_route_api(url_path):
@@ -113,7 +119,10 @@ def delete_route_api(url_path):
     if 'username' in session:
         filename = os.path.join(BASE_DIR, url_path)
         if os.path.exists(filename):
-            os.remove(filename)
+            if os.path.isdir(filename) :
+                delete_directory(filename)
+            elif os.path.isfile(filename):
+                os.remove(filename)
             app.logger.warning(f'Delete: {filename} finish!')
             return render_template('file.html')
         else:
@@ -122,7 +131,7 @@ def delete_route_api(url_path):
     else:
         return redirect(url_for('login'))
 
-suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python'}
+suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
 def file_preview( filename):
     if 'username' in session:
         if os.path.isdir(filename):

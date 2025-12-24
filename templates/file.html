@@ -518,15 +518,18 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                                     <div class="file-size">-</div>
                                     <div class="file-date">-</div>
                                 </div>
-                            </div>
-                        `;
+                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${dir_url}')" title="delete file">
+                                    <span style="font-size:15px;">🗑️ </span>
+                                </button>
+                            </div>`;
                     }
                 });
 
                 // 显示文件
                 data.files.forEach(file => {
                 const fileName = file.key;
-                const fileUrl = path + '/' + fileName;
+                fileUrl = path + '/' + fileName;
+                fileUrl = fileUrl.replace(/^\/+/, '/') // hand url startwith //
                 //console.log(` fileUrl:${fileUrl}, fileName:${fileName}`);
                 if (fileName && !(fileName.startsWith('.') && !ShowHideFile)) {
                     html += `
