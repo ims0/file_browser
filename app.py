@@ -4,7 +4,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 请替换为你自己的密钥
-BASE_DIR = '/home/ubuntu/'
+
+user_home = os.path.expanduser('~')
+print(user_home)
+BASE_DIR = user_home
 
 
 # 清除现有的Handlers
@@ -263,4 +266,5 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.logger.info(f'run')
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 20 MB
     app.run(host='127.0.0.1', port=5000, debug=True)
