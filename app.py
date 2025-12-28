@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, render_template_string,jsonify
-import json, os, html, logging, shutil
+import json, os, html, logging, shutil,threading
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 请替换为你自己的密钥
-
 user_home = os.path.expanduser('~')
 print(user_home)
 BASE_DIR = user_home
@@ -22,6 +22,13 @@ app.logger.addHandler(handler)
 # 设置日志级别
 app.logger.setLevel(logging.INFO)
 
+# 配置
+UPLOAD_FOLDER = BASE_DIR  # 修改为您的上传目录
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip', 'tar', 'gz', '7z'}
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024 * 1024  # 16GB最大文件大小
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 def load_users():
     if os.path.exists('users.json'):
         with open('users.json') as f:
@@ -49,7 +56,7 @@ def web_entry(url_path):
                 return file_preview(filename)
             else:
                 if os.path.isdir(filename) :
-                    return render_template('file.html')
+                    return render_template('browser.html')
                 elif os.path.isfile(filename):
                     return file_preview(filename)
                 else :
@@ -127,26 +134,26 @@ def delete_route_api(url_path):
             elif os.path.isfile(filename):
                 os.remove(filename)
             app.logger.warning(f'Delete: {filename} finish!')
-            return render_template('file.html')
+            return render_template('browser.html')
         else:
             app.logger.error(f'Not found:{filename}')
-            return render_template('file.html')
+            return render_template('browser.html')
     else:
         return redirect(url_for('login'))
 
 #Upload
-@app.route('/', methods=['POST'])
-def upload_file():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return "No file part"
-        file = request.files['file']
-        if file.filename == '':
-            return "No selected file"
-        if file:
-            file.save(os.path.join(BASE_DIR, file.filename))
-            return "File successfully uploaded"
-    return render_template('file.html')
+#@app.route('/', methods=['POST'])
+#def upload_file():
+#    if request.method == 'POST':
+#        if 'file' not in request.files:
+#            return "No file part"
+#        file = request.files['file']
+#        if file.filename == '':
+#            return "No selected file"
+#        if file:
+#            file.save(os.path.join(BASE_DIR, file.filename))
+#            return "File successfully uploaded"
+#    return render_template('browser.html')
 
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
 def file_preview( filename):
@@ -264,7 +271,120 @@ def download_file(filename):
             abort(404)
     return redirect(url_for('login'))
 
+
+
+# 检查文件扩展名
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# 确保目录存在
+def ensure_directory_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+# 文件上传路由
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # 检查是否有文件部分
+    if 'file' not in request.files:
+        return jsonify({'error': '没有文件部分'}), 400
+    
+    file = request.files['file']
+    path = request.form.get('path', '/')
+    
+    app.logger.info(f'path:{path}')
+    # 如果用户没有选择文件
+    if file.filename == '':
+        return jsonify({'error': '没有选择文件'}), 400
+    
+    if file and allowed_file(file.filename):
+        # 安全处理文件名
+        filename = secure_filename(file.filename)
+        
+        # 构建完整路径
+
+        target_path = os.path.join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+        ensure_directory_exists(target_path)
+        
+        # 完整文件路径
+        filepath = os.path.join(target_path, filename)
+        
+        try:
+            # 保存文件
+            file.save(filepath)
+            
+            # 获取文件信息
+            file_size = os.path.getsize(filepath)
+            
+            return jsonify({
+                'success': True,
+                'message': f'文件 {filename} 上传成功',
+                'filename': filename,
+                'size': file_size,
+                'path': path
+            }), 200
+            
+        except Exception as e:
+            return jsonify({'error': f'保存文件时出错: {str(e)}'}), 500
+    
+    return jsonify({'error': '不允许的文件类型'}), 400
+
+# 批量上传
+@app.route('/upload/batch', methods=['POST'])
+def upload_batch():
+    files = request.files.getlist('files[]')
+    path = request.form.get('path', '/')
+    
+    if not files:
+        return jsonify({'error': '没有文件'}), 400
+    
+    results = []
+    target_path = os.path.join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+    ensure_directory_exists(target_path)
+    
+    for file in files:
+        if file.filename == '':
+            continue
+            
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(target_path, filename)
+            
+            try:
+                file.save(filepath)
+                results.append({
+                    'filename': filename,
+                    'success': True,
+                    'message': '上传成功'
+                })
+            except Exception as e:
+                results.append({
+                    'filename': filename,
+                    'success': False,
+                    'message': f'上传失败: {str(e)}'
+                })
+        else:
+            results.append({
+                'filename': file.filename,
+                'success': False,
+                'message': '不允许的文件类型'
+            })
+    
+    return jsonify({
+        'total': len(files),
+        'successful': len([r for r in results if r['success']]),
+        'failed': len([r for r in results if not r['success']]),
+        'results': results
+    }), 200
+
+# 获取上传进度（可选，用于更精确的进度控制）
+@app.route('/upload/progress', methods=['GET'])
+def upload_progress():
+    # 这里可以实现基于session或临时文件的进度查询
+    # 需要更复杂的实现来跟踪每个上传的进度
+    return jsonify({'progress': 0}), 200
+
 if __name__ == '__main__':
     app.logger.info(f'run')
-    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 20 MB
     app.run(host='127.0.0.1', port=5000, debug=True)
