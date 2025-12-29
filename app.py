@@ -6,7 +6,15 @@ from werkzeug.utils import secure_filename
 from flask import abort
 from werkzeug.utils import safe_join
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # 请替换为你自己的密钥
+from dotenv import load_dotenv
+
+load_dotenv()  # 加载.env文件
+app.secret_key = os.environ.get('SECRET_KEY')
+if not app.secret_key:
+    # 生成安全的随机密钥
+    app.secret_key = os.urandom(24).hex()
+    app.logger.warning("Using auto-generated secret key. Set SECRET_KEY in .env for production.")
+
 user_home = os.path.expanduser('~')
 print(user_home)
 BASE_DIR = user_home
@@ -195,12 +203,16 @@ def delete_route_api(url_path):
 
 
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
-def file_preview( filename):
+def file_preview(filename, max_size=10*1024*1024):
     if 'username' in session:
         if os.path.isdir(filename):
             items = [{'name': item, 'is_dir': os.path.isdir(filename+'/' + item)} for item in os.listdir(filename)]
             return render_template('file_browser.html', items=items, curr_path=filename)
         elif os.path.isfile(filename):
+            # 检查文件大小
+            file_size = os.path.getsize(filename)
+            if file_size > max_size:
+                return None, "文件过大，请下载查看"
             suffix = os.path.splitext(filename)[1]
             if suffix in suffix_lang:
                 try:
