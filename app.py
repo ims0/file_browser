@@ -3,12 +3,31 @@ import json, os, html, logging, shutil,threading
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from flask import abort
+from werkzeug.utils import safe_join
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 请替换为你自己的密钥
 user_home = os.path.expanduser('~')
 print(user_home)
 BASE_DIR = user_home
 
+def secure_path_join(base_path, user_path):
+    """安全的路径拼接函数"""
+    try:
+        # 规范化路径，移除多余的..
+        safe_path = os.path.normpath(user_path)
+        # 确保路径仍在base_dir内
+        full_path = safe_join(base_path, safe_path.lstrip('/'))
+        
+        # 再次验证路径在base_dir内
+        if not full_path.startswith(os.path.abspath(base_path)):
+            app.logger.warning(f"Path traversal attempt: {user_path}")
+            abort(403)
+            
+        return full_path
+    except Exception as e:
+        app.logger.error(f"Path validation error: {e}")
+        abort(400)
 
 # 清除现有的Handlers
 app.logger.handlers = []
@@ -48,7 +67,7 @@ def web_entry(url_path):
     if 'username' in session:
         app.logger.info(f'web_entry, url:{url_path}')
         action = request.args.get('action')
-        filename = os.path.join(BASE_DIR, url_path)
+        filename = secure_path_join(BASE_DIR, url_path)
         if os.path.exists(filename):
             if action == 'download':
                 return download_file(filename)
@@ -122,38 +141,58 @@ def delete_directory(path):
         app.logger.info(f"Successfully deleted the directory: {path}")
     except Exception as e:
         app.logger.info(f"Error: {e}")
-# DELETE
+import shutil
+from datetime import datetime
+
+# 添加回收站功能
+TRASH_DIR = os.path.join(BASE_DIR, '.trash')
+os.makedirs(TRASH_DIR, exist_ok=True)
+
+def move_to_trash(filepath):
+    """移动文件到回收站而不是直接删除"""
+    if not os.path.exists(filepath):
+        return False
+    try:
+        # 生成唯一的回收站路径
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        basename = os.path.basename(filepath)
+        trash_path = os.path.join(TRASH_DIR, f"{timestamp}_{basename}")
+        
+        # 移动文件到回收站
+        if os.path.isdir(filepath):
+            shutil.move(filepath, trash_path)
+        else:
+            shutil.move(filepath, trash_path)
+        
+        app.logger.info(f"Moved to trash: {filepath} -> {trash_path}")
+        return True
+    except Exception as e:
+        app.logger.error(f"Move to trash failed: {e}")
+        return False
+
+# DELETE处理
 @app.route('/<path:url_path>', methods=['DELETE'])
 def delete_route_api(url_path):
-    app.logger.info(f'url:{url_path}')
-    if 'username' in session:
-        filename = os.path.join(BASE_DIR, url_path)
-        if os.path.exists(filename):
-            if os.path.isdir(filename) :
-                delete_directory(filename)
-            elif os.path.isfile(filename):
-                os.remove(filename)
-            app.logger.warning(f'Delete: {filename} finish!')
-            return render_template('browser.html')
-        else:
-            app.logger.error(f'Not found:{filename}')
-            return render_template('browser.html')
+    if 'username' not in session:
+        abort(401)
+    
+    # 1. 路径安全验证
+    filename = secure_path_join(BASE_DIR, url_path)
+    app.logger.info(f"DELETE request for: {filename}")
+    # 2. 验证用户权限（示例：只允许admin删除）
+    if session.get('username') != 'root':
+        abort(403)
+    
+    # 3. 验证文件存在
+    if not os.path.exists(filename):
+        abort(404)
+    
+    # 4. 移动到回收站而不是直接删除
+    if move_to_trash(filename):
+        return jsonify({'success': True, 'message': '文件已移至回收站'}), 200
     else:
-        return redirect(url_for('login'))
+        return jsonify({'error': '删除失败'}), 500
 
-#Upload
-#@app.route('/', methods=['POST'])
-#def upload_file():
-#    if request.method == 'POST':
-#        if 'file' not in request.files:
-#            return "No file part"
-#        file = request.files['file']
-#        if file.filename == '':
-#            return "No selected file"
-#        if file:
-#            file.save(os.path.join(BASE_DIR, file.filename))
-#            return "File successfully uploaded"
-#    return render_template('browser.html')
 
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
 def file_preview( filename):
@@ -190,11 +229,6 @@ def file_preview( filename):
             app.logger.error(f'Preview: Not found: {filename}')
             abort(404)
     return redirect(url_for('login'))
-#@app.route('/')
-#def home():
-#    if 'username' in session:
-#        return redirect(url_for('welcome'))
-#    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -242,26 +276,16 @@ def file_browser():
         try:
             path = BASE_DIR
             print("/file_browser, path:", path)
-            items = [{'name': item, 'is_dir': os.path.isdir(os.path.join(path, item))} for item in os.listdir(path)]
+            items = [{'name': item, 'is_dir': os.path.isdir(secure_path_join(path, item))} for item in os.listdir(path)]
         except FileNotFoundError:
             items = []
         return render_template('file_browser.html', items=items, curr_path=path)
     return redirect(url_for('login'))
 
-#@app.route('/file/<filename>')
-#def file_preview(filename):
-#    if 'username' in session:
-#        file_path = os.path.join(BASE_DIR, filename)
-#        if os.path.isfile(file_path):
-#            return send_from_directory(BASE_DIR, filename)
-#        else:
-#            abort(404)
-#    return redirect(url_for('login'))
-
 @app.route('/download/<filename>')
 def download_file(filename):
     if 'username' in session:
-        file_path = os.path.join(BASE_DIR, filename)
+        file_path = secure_path_join(BASE_DIR, filename)
         app.logger.info(f'file_path:{file_path}')
         if os.path.isfile(file_path):
             app.logger.info(f'do download file:{file_path}')
@@ -304,11 +328,11 @@ def upload_file():
         
         # 构建完整路径
 
-        target_path = os.path.join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+        target_path = secure_path_join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
         ensure_directory_exists(target_path)
         
         # 完整文件路径
-        filepath = os.path.join(target_path, filename)
+        filepath = secure_path_join(target_path, filename)
         
         try:
             # 保存文件
@@ -340,7 +364,7 @@ def upload_batch():
         return jsonify({'error': '没有文件'}), 400
     
     results = []
-    target_path = os.path.join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+    target_path = secure_path_join(app.config['UPLOAD_FOLDER'], path.lstrip('/'))
     ensure_directory_exists(target_path)
     
     for file in files:
@@ -349,7 +373,7 @@ def upload_batch():
             
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            filepath = os.path.join(target_path, filename)
+            filepath = secure_path_join(target_path, filename)
             
             try:
                 file.save(filepath)
