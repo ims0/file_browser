@@ -97,45 +97,37 @@ def web_entry(url_path):
 @app.route('/', defaults={'file_path': '/'}, methods=['PUT'])
 @app.route('/<path:file_path>', methods=['PUT'])
 def data_response_put_api(file_path):
-    app.logger.info(f'=== data request url: {file_path}')
-    response_data = {
-        "directories": [],
-        "files": [],
-    }
     if 'username' not in session:
-        print("file_response, file_path arg:", file_path)
-        app.logger.info(f'Not login')
-        return jsonify(response_data)
-    # 指定要列出的目录路径
-    if file_path[0] != '/' :
-        file_path = '/' + file_path
-
-    dir_path = BASE_DIR + file_path
+        app.logger.error(f'Not login')
+        return jsonify({"directories": [], "files": []}), 401
+    # 使用安全的路径处理
+    app.logger.info(f'=== data request url: {file_path}')
+    try:
+        dir_path = secure_path_join(BASE_DIR, file_path)
+    except:
+        return jsonify({"directories": [], "files": []}), 403
 
     if not os.path.isdir(dir_path):
         app.logger.info(f"dir is not exist:{dir_path}")
-        return jsonify(response_data)
+        return jsonify({"directories": [], "files": []}), 404
 
     # 初始化目录和文件列表
     directories = []
     files = []
     # 遍历目录内容
     for entry in os.scandir(dir_path):
-        #print(entry.path, ":", entry.path.removeprefix(BASE_DIR), "basedir:",BASE_DIR )
-        base_name = os.path.basename(entry.path)
-        if base_name.startswith('.'):
+        if entry.name.startswith('.'):
             continue
         if entry.is_dir():
-            directories.append(base_name)
+            directories.append(entry.name)  # ✅ 直接使用entry.name
         elif entry.is_file():
-            # 获取文件信息
+            stat = entry.stat()
             file_info = {
-                "key": base_name,
-                "size": entry.stat().st_size,
-                "lastModified": datetime.utcfromtimestamp(entry.stat().st_mtime).isoformat() + 'Z'
+                "key": entry.name,  # ✅ 直接使用entry.name
+                "size": stat.st_size,
+                "lastModified": datetime.utcfromtimestamp(stat.st_mtime).isoformat() + 'Z'
             }
             files.append(file_info)
-
     # 构建响应数据
     response_data = {
         "directories": directories,
@@ -205,14 +197,12 @@ def delete_route_api(url_path):
 suffix_lang = {'.c': 'c', '.h': 'c', '.hpp':'cpp', '.cpp':'cpp', '.sh':'bash', '.py':'python', '.md':'markdown'}
 def file_preview(filename, max_size=10*1024*1024):
     if 'username' in session:
-        if os.path.isdir(filename):
-            items = [{'name': item, 'is_dir': os.path.isdir(filename+'/' + item)} for item in os.listdir(filename)]
-            return render_template('file_browser.html', items=items, curr_path=filename)
-        elif os.path.isfile(filename):
+        if os.path.isfile(filename):
             # 检查文件大小
             file_size = os.path.getsize(filename)
             if file_size > max_size:
-                return None, "文件过大，请下载查看"
+                app.logger.info(f'File size {file_size} exceed max size {max_size}')
+                return send_from_directory(os.path.dirname(filename), os.path.basename(filename))
             suffix = os.path.splitext(filename)[1]
             if suffix in suffix_lang:
                 try:
@@ -296,15 +286,17 @@ def file_browser():
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    if 'username' in session:
-        file_path = secure_path_join(BASE_DIR, filename)
-        app.logger.info(f'file_path:{file_path}')
-        if os.path.isfile(file_path):
-            app.logger.info(f'do download file:{file_path}')
-            return send_from_directory(os.path.dirname(filename), os.path.basename(filename), as_attachment=True)
-        else:
-            app.logger.error(f'Not found file:{file_path}')
-            abort(404)
+    if 'username' not in session:
+        abort(401)
+    file_path = secure_path_join(BASE_DIR, filename)
+    app.logger.info(f'download_file:{file_path}')
+
+    if os.path.isfile(file_path):
+        app.logger.info(f'do download file:{file_path}')
+        return send_from_directory(os.path.dirname(file_path), os.path.basename(file_path), as_attachment=True)
+    else:
+        app.logger.error(f'Not found file:{file_path}')
+        abort(404)
     return redirect(url_for('login'))
 
 
@@ -421,6 +413,12 @@ def upload_progress():
     # 需要更复杂的实现来跟踪每个上传的进度
     return jsonify({'progress': 0}), 200
 
+app.config.update(
+    SESSION_COOKIE_SECURE=False,      # 生产环境应该为True
+    SESSION_COOKIE_HTTPONLY=True,     # 应该启用
+    SESSION_COOKIE_SAMESITE='Lax',    # 推荐Lax
+    PERMANENT_SESSION_LIFETIME=3600   # 1小时过期
+)
 if __name__ == '__main__':
     app.logger.info(f'run')
     app.run(host='0.0.0.0', port=5000, debug=True)
