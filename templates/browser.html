@@ -763,7 +763,7 @@ function navigate(path) {
     updateBreadcrumb(path);
     loadFiles(path);
 }
-// 在文件处理函数之前，可以先定义目录处理函数
+// 目录处理函数
 function generateDirItemHTML(dir, path) {
     let dirUrl = path + '/' + dir;
     dirUrl = dirUrl.replace(/^\/+/, '/');
@@ -773,18 +773,18 @@ function generateDirItemHTML(dir, path) {
     return `
         <div class="file-item">
             <div class="file-icon">${getFileIcon(dir, true)}</div>
-            <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dirUrl}', false)">${dir}/</a>
-            <div class="file-info">
-                <div class="file-size">-</div>
-                <div class="file-date">-</div>
-            </div>
+            <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dirUrl}', false)">${dir.key}/</a>
             <button class="osslink-btn" onclick="DeleteConfirmDialog('${dirUrl}')" title="delete file">
                 <span style="font-size:15px;">🗑️</span>
             </button>
+            <div class="file-info">
+                <div class="file-size">-</div>
+                <div class="file-date">${formatDate(dir.lastModified)}</div>
+            </div>
         </div>`;
 }
 
-// 文件处理函数（您之前已经拆分的）
+// 文件处理函数
 function generateFileItemHTML(file, path) {
     const fileName = file.key;
     let fileUrl = path + '/' + fileName;
@@ -798,15 +798,15 @@ function generateFileItemHTML(file, path) {
         <div class="file-item">
             <div class="file-icon">${getFileIcon(fileName, false)}</div>
             <a href="${fileUrl}" class="file-name" target="_blank">${fileName}</a>
+            <button class="osslink-btn" onclick="OnDownload('${fileUrl}')">
+                <span style="font-size:15px;">⬇️</span>
+            </button>
+            <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
+                <span style="font-size:15px;">🗑️</span>
+            </button>
             <div class="file-info">
                 <div class="file-size">${formatFileSize(file.size)}</div>
                 <div class="file-date">${formatDate(file.lastModified)}</div>
-                <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
-                    <span style="font-size:15px;">🗑️</span>
-                </button>
-                <button class="osslink-btn" onclick="OnDownload('${fileUrl}')">
-                    <span style="font-size:15px;">⬇️</span>
-                </button>
             </div>
         </div>`;
 }

@@ -153,18 +153,16 @@ def data_response_put_api(file_path):
     for entry in os.scandir(dir_path):
         if entry.name.startswith("."):
             continue
+        modify_time = datetime.utcfromtimestamp(entry.stat().st_mtime).isoformat()
+        file_info = {
+            "key": entry.name,
+            "size": entry.stat().st_size,
+            "lastModified": modify_time,
+        }
         if entry.is_dir():
-            directories.append(entry.name)  # ✅ 直接使用entry.name
+            directories.append(file_info)
         elif entry.is_file():
-            stat = entry.stat()
-            file_info = {
-                "key": entry.name,  # ✅ 直接使用entry.name
-                "size": stat.st_size,
-                "lastModified": datetime.utcfromtimestamp(stat.st_mtime).isoformat()
-                + "Z",
-            }
             files.append(file_info)
-    # 构建响应数据
     response_data = {
         "directories": directories,
         "files": files,
