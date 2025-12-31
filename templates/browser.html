@@ -1084,18 +1084,18 @@
           let html = "";
 
           if (dirReverse) {
-            data.directories.forEach((dir) => {
-              html += generateDirItemHTML(dir, path);
-            });
             data.files.forEach((file) => {
               html += generateFileItemHTML(file, path);
+            });
+            data.directories.forEach((dir) => {
+              html += generateDirItemHTML(dir, path);
             });
           } else {
-            data.files.forEach((file) => {
-              html += generateFileItemHTML(file, path);
-            });
             data.directories.forEach((dir) => {
               html += generateDirItemHTML(dir, path);
+            });
+            data.files.forEach((file) => {
+              html += generateFileItemHTML(file, path);
             });
           }
 
