@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CI 文件浏览器</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CI 文件浏览器</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -280,7 +280,7 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
         }
-    
+
         /* 上传按钮样式 */
         .upload-btn {
             position: absolute;
@@ -293,8 +293,8 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
 
-                height: 37px;          /* 设置高度 */
-                /* 添加Flex布局 */
+            height: 37px;          /* 设置高度 */
+            /* 添加Flex布局 */
             display: flex;
             align-items: center;     /* 垂直居中 */
             justify-content: center; /* 水平居中 */
@@ -313,50 +313,50 @@
         }
 
 
-/* 上传弹窗样式 */
-#dropZone {
-    transition: all 0.3s ease;
-}
+        /* 上传弹窗样式 */
+        #dropZone {
+            transition: all 0.3s ease;
+        }
 
-#dropZone:hover {
-    background-color: #f8f9fa;
-    border-color: #2980b9;
-}
+        #dropZone:hover {
+            background-color: #f8f9fa;
+            border-color: #2980b9;
+        }
 
-#uploadModal h2 {
-    font-size: 1.5em;
-    margin: 0;
-    color: #2c3e50;
-}
+        #uploadModal h2 {
+            font-size: 1.5em;
+            margin: 0;
+            color: #2c3e50;
+        }
 
-/* 进度条动画 */
-#uploadProgressBar, #overallProgressBar {
-    transition: width 0.3s ease;
-}
+        /* 进度条动画 */
+        #uploadProgressBar, #overallProgressBar {
+            transition: width 0.3s ease;
+        }
 
-/* 文件预览表格 */
-#filePreviewBody tr:hover {
-    background-color: #f8f9fa;
-}
+        /* 文件预览表格 */
+        #filePreviewBody tr:hover {
+            background-color: #f8f9fa;
+        }
 
-/* 上传按钮状态 */
-#uploadBtn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+        /* 上传按钮状态 */
+        #uploadBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
-    #uploadModal > div {
-        min-width: 90vw;
-        max-width: 90vw;
-        padding: 16px;
-    }
-    
-    #dropZone {
-        padding: 30px 15px;
-    }
-}
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            #uploadModal > div {
+                min-width: 90vw;
+                max-width: 90vw;
+                padding: 16px;
+            }
+
+            #dropZone {
+                padding: 30px 15px;
+            }
+        }
 
         /* 状态栏样式 */
         .status-bar {
@@ -376,13 +376,13 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
         }
-        
+
         .status-right {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .username {
             font-size: 14px;
             color: #ecf0f1;
@@ -393,7 +393,7 @@
             border: 1px solid rgba(255,255,255,0.2);
             backdrop-filter: blur(5px);
         }
-        
+
         .logout-btn {
             background: rgba(231, 76, 60, 0.2);
             border: 1px solid rgba(231, 76, 60, 0.4);
@@ -408,17 +408,17 @@
             gap: 6px;
             backdrop-filter: blur(5px);
         }
-        
+
         .logout-btn:hover {
             background: rgba(231, 76, 60, 0.3);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
         }
-        
+
         .logout-btn:active {
             transform: translateY(0);
         }
-        
+
         /* 调整主容器位置，为状态栏留出空间 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -426,12 +426,12 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        
+
         /* 当状态栏显示时，调整容器位置 */
         body.status-bar-active {
             padding-top: 60px;
         }
-        
+
         /* 响应式调整 */
         @media (max-width: 768px) {
             .status-bar {
@@ -449,414 +449,424 @@
                 padding-top: 50px;
             }
         }
-    </style>
-</head>
+        </style>
+    </head>
 
-<!-- 上传弹窗 -->
-<div id="uploadModal" style="display:none;">
-    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;" onclick="closeUploadModal(event)"></div>
-    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:2001;min-width:400px;max-width:600px;width:90vw;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-            <h2 style="margin:0;color:#2c3e50;font-size:1.5em;">📤 文件上传</h2>
-            <button onclick="closeUploadModal()" style="background:none;border:none;font-size:24px;color:#7f8c8d;cursor:pointer;line-height:1;">&times;</button>
+    <!-- 上传弹窗 -->
+    <div id="uploadModal" style="display:none;">
+        <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;" onclick="closeUploadModal(event)"></div>
+        <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:24px;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2);z-index:2001;min-width:400px;max-width:600px;width:90vw;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <h2 style="margin:0;color:#2c3e50;font-size:1.5em;">📤 文件上传</h2>
+                <button onclick="closeUploadModal()" style="background:none;border:none;font-size:24px;color:#7f8c8d;cursor:pointer;line-height:1;">&times;</button>
+            </div>
+
+            <!-- 上传表单 -->
+            <div id="uploadForm">
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;color:#2c3e50;font-weight:500;">上传到目录：</label>
+                    <div style="background:#f8f9fa;padding:12px;border-radius:6px;border:1px solid #ddd;font-family:monospace;">
+                        <span id="uploadCurrentPath">${currentPath}</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;color:#2c3e50;font-weight:500;">选择文件：</label>
+                    <div style="border:2px dashed #3498db;border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.3s;"
+                         id="dropZone" 
+                         onclick="document.getElementById('fileInput').click()"
+                         ondrop="handleDrop(event)"
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:48px;color:#3498db;margin-bottom:16px;"></i>
+                        <p style="margin:0 0 12px 0;color:#2c3e50;font-size:1.1em;">点击或拖拽文件到此区域</p>
+                        <p style="margin:0;color:#7f8c8d;font-size:0.9em;">支持单个或多个文件上传</p>
+                        <input type="file" id="fileInput" multiple style="display:none;" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+
+                <!-- 文件列表预览 -->
+                <div id="fileListPreview" style="max-height:200px;overflow-y:auto;margin-bottom:20px;display:none;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f8f9fa;">
+                                <th style="padding:8px;text-align:left;border-bottom:1px solid #ddd;">文件名</th>
+                                <th style="padding:8px;text-align:right;border-bottom:1px solid #ddd;width:100px;">大小</th>
+                                <th style="padding:8px;text-align:center;border-bottom:1px solid #ddd;width:60px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filePreviewBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- 进度条区域 -->
+                <div id="uploadProgressArea" style="display:none;">
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span id="currentFileName" style="font-weight:500;color:#2c3e50;"></span>
+                            <span id="uploadPercentage" style="color:#3498db;font-weight:500;">0%</span>
+                        </div>
+                        <div style="height:8px;background:#ecf0f1;border-radius:4px;overflow:hidden;">
+                            <div id="uploadProgressBar" style="height:100%;background:#3498db;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;font-size:0.9em;color:#7f8c8d;">
+                        <span>已上传: <span id="uploadedSize">0 B</span></span>
+                        <span>总大小: <span id="totalSize">0 B</span></span>
+                    </div>
+
+                    <!-- 整体进度 -->
+                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid #ecf0f1;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="font-weight:500;color:#2c3e50;">整体进度</span>
+                            <span id="overallPercentage" style="color:#27ae60;font-weight:500;">0%</span>
+                        </div>
+                        <div style="height:6px;background:#ecf0f1;border-radius:3px;overflow:hidden;">
+                            <div id="overallProgressBar" style="height:100%;background:#27ae60;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按钮区域 -->
+                <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
+                    <button onclick="startUpload()" id="uploadBtn" 
+                                                    style="background:#3498db;color:white;border:none;padding:10px 24px;border-radius:6px;font-size:1em;cursor:pointer;display:none;">
+                        <i class="fas fa-upload"></i> 开始上传
+                    </button>
+                    <button onclick="closeUploadModal()" 
+                            style="background:#ecf0f1;color:#2c3e50;border:none;padding:10px 20px;border-radius:6px;font-size:1em;cursor:pointer;">
+                        取消
+                    </button>
+                </div>
+
+                <!-- 上传结果 -->
+                <div id="uploadResult" style="margin-top:20px;display:none;"></div>
+            </div>
         </div>
-        
-        <!-- 上传表单 -->
-        <div id="uploadForm">
-            <div style="margin-bottom:20px;">
-                <label style="display:block;margin-bottom:8px;color:#2c3e50;font-weight:500;">上传到目录：</label>
-                <div style="background:#f8f9fa;padding:12px;border-radius:6px;border:1px solid #ddd;font-family:monospace;">
-                    <span id="uploadCurrentPath">${currentPath}</span>
-                </div>
-            </div>
-            
-            <div style="margin-bottom:20px;">
-                <label style="display:block;margin-bottom:8px;color:#2c3e50;font-weight:500;">选择文件：</label>
-                <div style="border:2px dashed #3498db;border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.3s;"
-                     id="dropZone" 
-                     onclick="document.getElementById('fileInput').click()"
-                     ondrop="handleDrop(event)"
-                     ondragover="handleDragOver(event)"
-                     ondragleave="handleDragLeave(event)">
-                    <i class="fas fa-cloud-upload-alt" style="font-size:48px;color:#3498db;margin-bottom:16px;"></i>
-                    <p style="margin:0 0 12px 0;color:#2c3e50;font-size:1.1em;">点击或拖拽文件到此区域</p>
-                    <p style="margin:0;color:#7f8c8d;font-size:0.9em;">支持单个或多个文件上传</p>
-                    <input type="file" id="fileInput" multiple style="display:none;" onchange="handleFileSelect(event)">
-                </div>
-            </div>
-            
-            <!-- 文件列表预览 -->
-            <div id="fileListPreview" style="max-height:200px;overflow-y:auto;margin-bottom:20px;display:none;">
-                <table style="width:100%;border-collapse:collapse;">
-                    <thead>
-                        <tr style="background:#f8f9fa;">
-                            <th style="padding:8px;text-align:left;border-bottom:1px solid #ddd;">文件名</th>
-                            <th style="padding:8px;text-align:right;border-bottom:1px solid #ddd;width:100px;">大小</th>
-                            <th style="padding:8px;text-align:center;border-bottom:1px solid #ddd;width:60px;">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="filePreviewBody"></tbody>
-                </table>
-            </div>
-            
-            <!-- 进度条区域 -->
-            <div id="uploadProgressArea" style="display:none;">
-                <div style="margin-bottom:12px;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span id="currentFileName" style="font-weight:500;color:#2c3e50;"></span>
-                        <span id="uploadPercentage" style="color:#3498db;font-weight:500;">0%</span>
-                    </div>
-                    <div style="height:8px;background:#ecf0f1;border-radius:4px;overflow:hidden;">
-                        <div id="uploadProgressBar" style="height:100%;background:#3498db;width:0%;transition:width 0.3s;"></div>
-                    </div>
-                </div>
-                
-                <div style="display:flex;justify-content:space-between;font-size:0.9em;color:#7f8c8d;">
-                    <span>已上传: <span id="uploadedSize">0 B</span></span>
-                    <span>总大小: <span id="totalSize">0 B</span></span>
-                </div>
-                
-                <!-- 整体进度 -->
-                <div style="margin-top:16px;padding-top:16px;border-top:1px solid #ecf0f1;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span style="font-weight:500;color:#2c3e50;">整体进度</span>
-                        <span id="overallPercentage" style="color:#27ae60;font-weight:500;">0%</span>
-                    </div>
-                    <div style="height:6px;background:#ecf0f1;border-radius:3px;overflow:hidden;">
-                        <div id="overallProgressBar" style="height:100%;background:#27ae60;width:0%;transition:width 0.3s;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 按钮区域 -->
-            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
-                <button onclick="startUpload()" id="uploadBtn" 
-                        style="background:#3498db;color:white;border:none;padding:10px 24px;border-radius:6px;font-size:1em;cursor:pointer;display:none;">
-                    <i class="fas fa-upload"></i> 开始上传
+    </div>
+
+
+
+    <body>
+
+        <!-- 顶部状态栏 -->
+        <div id="statusBar" class="status-bar" style="display: none;">
+            <div class="status-left"></div>
+            <div class="status-right">
+                <span id="usernameDisplay" class="username"></span>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> 注销
                 </button>
-                <button onclick="closeUploadModal()" 
-                        style="background:#ecf0f1;color:#2c3e50;border:none;padding:10px 20px;border-radius:6px;font-size:1em;cursor:pointer;">
-                    取消
+            </div>
+        </div>
+
+        <!-- 遮罩层 -->
+        <div class="overlay" id="overlay" onclick="toggleHelp()"></div>
+
+        <div class="container">
+            <div class="header">
+                <h1>文件浏览器</h1>
+                <button class="upload-btn" id="openUploadModal">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3 class="download-help-title"> Upload </h3>
                 </button>
-            </div>
-            
-            <!-- 上传结果 -->
-            <div id="uploadResult" style="margin-top:20px;display:none;"></div>
-        </div>
-    </div>
-</div>
 
-
-
-<body>
-
-    <!-- 顶部状态栏 -->
-    <div id="statusBar" class="status-bar" style="display: none;">
-        <div class="status-left"></div>
-        <div class="status-right">
-            <span id="usernameDisplay" class="username"></span>
-            <button id="logoutBtn" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> 注销
-            </button>
-        </div>
-    </div>
-
-    <!-- 遮罩层 -->
-    <div class="overlay" id="overlay" onclick="toggleHelp()"></div>
-
-    <div class="container">
-        <div class="header">
-            <h1>文件浏览器</h1>
-        <button class="upload-btn" id="openUploadModal">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <h3 class="download-help-title"> Upload </h3>
-        </button>
-
-            <!-- 右下角的下载建议按钮 -->
-            <div class="download-help" id="downloadHelp">
-                <div class="download-help-header" onclick="toggleHelp()">
-                    <h3 class="download-help-title">💡 大文件下载建议</h3>
-                    <button class="download-toggle"></button>
-                </div>
-                <div class="download-methods">
-                    <div class="method-card" style="background:#fffbe6;border-left:4px solid #e67e22;margin-bottom:18px;">
-                        <div style="color:#b26a00;font-size:15px;line-height:1.7;">
-                            <b>说明：</b>如遇内网下载带宽已满或不稳定时，可生成外网下载链接。外网下载带宽与内网隔离，互不影响。
-                        </div>
+                <!-- 右下角的下载建议按钮 -->
+                <div class="download-help" id="downloadHelp">
+                    <div class="download-help-header" onclick="toggleHelp()">
+                        <h3 class="download-help-title">💡 大文件下载建议</h3>
+                        <button class="download-toggle"></button>
                     </div>
-                    <div class="method-card">
-                        <div class="method-title">
-                            <span>🔄 wget 断点续传 - 推荐Linux/Unix系统使用</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-block">
-wget -c --tries=5 --retry-connrefused --waitretry=10 --timeout=300 --read-timeout=600 "http://your-server/path/to/file.tar.gz"
-                        </div>
-                    </div>
-
-                    <div class="method-card">
-                        <div class="method-title">
-                            <span>🚀 curl 标准版 - 支持断点续传，自动提取文件名</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-block">
-curl -L -C - -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://your-server/path/to/file.tar.gz"
-                        </div>
-                    </div>
-
-                    <div class="method-card">
-                        <div class="method-title">
-                            <span>💻 Windows CMD 兼容版</span>
-                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                        </div>
-                        <div class="code-block">
-curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://your-server/path/to/file.tar.gz"
-                        </div>
-                        <div class="method-note">
-                            ✅ Windows CMD完全兼容 | ❌ 不支持断点续传
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="breadcrumb" id="breadcrumb">
-            <span id="breadcrumb-inner"></span>
-            <button id="dirSortBtn" type="button" style="float:right;margin-left:16px;background:none;border:none;color:#3498db;font-size:18px;vertical-align:middle;cursor:pointer;line-height:1;" title="切换目录排序">
-                <span id="dirSortIcon">↓</span>
-            </button>
-        </div>
-        <div class="file-list" id="fileList">
-            <div class="loading">正在加载...</div>
-        </div>
-    </div>
-
-    <script>
-    let currentPath = '';
-    let currentBasePath = '';
-    // 目录倒序状态
-    let dirReverse = false;
-
-        // 检测当前的基础路径
-        function detectBasePath() {
-            const path = window.location.pathname;
-            const basePaths = ['/share', '/data/xpilot']; // 从后端配置动态注入
-            for (const basePath of basePaths) {
-                if (path.startsWith(basePath)) {
-                    return basePath;
-                }
-            }
-            return ''; // 根路径
-        }
-
-        // 初始化基础路径
-        currentBasePath = window.location.pathname;
-        console.log('Initialized base path:', currentBasePath); // 打印初始化的基础路径
-        ShowHideFile  = true
-        // 格式化文件大小
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // 格式化日期
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleString('zh-CN');
-        }
-
-        // 获取文件图标
-        function getFileIcon(fileName, isDir) {
-            if (isDir) {
-                return '📁';
-            }
-
-            const ext = fileName.split('.').pop().toLowerCase();
-            const iconMap = {
-                'txt': '📄',
-                'pdf': '📕',
-                'doc': '📘',
-                'docx': '📘',
-                'xls': '📗',
-                'xlsx': '📗',
-                'ppt': '📙',
-                'pptx': '📙',
-                'zip': '📦',
-                'rar': '📦',
-                '7z': '📦',
-                'tar': '📦',
-                'gz': '📦',
-                'jpg': '🖼️',
-                'jpeg': '🖼️',
-                'png': '🖼️',
-                'gif': '🖼️',
-                'bmp': '🖼️',
-                'mp3': '🎵',
-                'wav': '🎵',
-                'mp4': '🎬',
-                'avi': '🎬',
-                'mov': '🎬'
-            };
-
-            return iconMap[ext] || '📄';
-        }
-
-        // 从 URL 获取当前路径
-        function getCurrentPathFromURL() {
-            let path = window.location.pathname;
-
-            // 如果有基础路径，移除它
-            //if (currentBasePath && path.startsWith(currentBasePath)) {
-            //    path = path.substring(currentBasePath.length);
-            //}
-
-            // 移除开头的 /
-            //if (path.startsWith('/')) {
-            //    path = path.substring(1);
-            //}
-
-            return path;
-        }
-
-        // 更新 URL 但不刷新页面
-        function updateURL(path) {
-            const url = path;
-            window.history.pushState({ path: path }, '', url);
-        }
-
-        // 更新面包屑导航
-        function updateBreadcrumb(path) {
-            const inner = document.getElementById('breadcrumb-inner');
-            let html = `<a href="#" onclick="navigateWithEvent(event, '/')">根目录</a>`;
-            if (path) {
-                const parts = path.split('/').filter(part => part);
-                let currentPathPart = '/';
-                parts.forEach((part, index) => {
-                    currentPathPart += part + '/';
-                    console.log(`updateBreadcrumb ${currentPathPart}:${part}`);
-                    html += ` / <a href=\"#\" onclick=\"navigateWithEvent(event, '${currentPathPart}')\">${part}</a>`;
-                });
-            }
-            inner.innerHTML = html;
-            // 同步按钮图标
-            const icon = document.getElementById('dirSortIcon');
-            if (icon) icon.textContent = dirReverse ? '↑' : '↓';
-        }
-
-        // 导航到指定路径（带事件处理）
-        function navigateWithEvent(event, path) {
-            console.log(`navigateWithEvent path:${path}`);
-            event.preventDefault();
-            navigate(path);
-        }
-
-        // 导航到指定路径
-        function navigate(path) {
-            console.log(`navigate path:${path}`);
-            currentPath = path;
-            updateURL(path);
-            updateBreadcrumb(path);
-            loadFiles(path);
-        }
-
-        // 加载文件列表
-        async function loadFiles(path) {
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '<div class="loading">正在加载...</div>';
-            // 在加载时显示当前用户
-            const username = sessionStorage.getItem('username');
-            if (username) {
-                console.log(`当前用户: ${username}, 正在加载路径: ${path}`);
-            }
-            console.log(`start ----- loadFiles path:${path}`);
-            try {
-                tmp_url =  path
-                const fetch_url = tmp_url.substring(tmp_url.lastIndexOf('/') + 1);
-                console.log(`loadFiles:${path},fetch_url: ${fetch_url}`);
-                const response = await fetch(path, {method:'PUT'});
-                const data = await response.json();
-
-                if (data.error) {
-                    fileList.innerHTML = `<div class="error">错误: ${data.error}</div>`;
-                    return;
-                }
-
-                if (data.directories.length === 0 && data.files.length === 0) {
-                    fileList.innerHTML = '<div class="empty">此目录为空</div>';
-                    return;
-                }
-
-                let html = '';
-
-                // 目录排序（只影响目录，正序/倒序）
-                let dirs = data.directories.slice();
-                if (dirReverse) dirs.reverse();
-                dirs.forEach(dir => {
-                    dir_url = path+'/'+dir
-                    dir_url = dir_url.replace(/^\/+/, '/') // hand url startwith //
-                    //console.log(` dir:${dir}, dir_url:${dir_url}`);
-                    if (dir) {
-                        html += `
-                            <div class="file-item">
-                                <div class="file-icon">${getFileIcon(dir, true)}</div>
-                                <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dir_url}', false)">${dir}/</a>
-                                <div class="file-info">
-                                    <div class="file-size">-</div>
-                                    <div class="file-date">-</div>
-                                </div>
-                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${dir_url}')" title="delete file">
-                                    <span style="font-size:15px;">🗑️ </span>
-                                </button>
-                            </div>`;
-                    }
-                });
-
-                // 显示文件
-                data.files.forEach(file => {
-                const fileName = file.key;
-                fileUrl = path + '/' + fileName;
-                fileUrl = fileUrl.replace(/^\/+/, '/') // hand url startwith //
-                //console.log(` fileUrl:${fileUrl}, fileName:${fileName}`);
-                if (fileName && !(fileName.startsWith('.') && !ShowHideFile)) {
-                    html += `
-                        <div class="file-item">
-                            <div class="file-icon">${getFileIcon(fileName, false)}</div>
-                            <a href="${fileUrl}" class="file-name" target="_blank" >${fileName}</a>
-                            <div class="file-info">
-                                <div class="file-size">${formatFileSize(file.size)}</div>
-                                <div class="file-date">${formatDate(file.lastModified)}</div>
-                                <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
-                                    <span style="font-size:15px;">🗑️ </span>
-                                </button>
-                                <button class="osslink-btn" onclick="OnDownload('${fileUrl}')">
-                                    <span style="font-size:15px;">⬇️</span>
-                                </button>
+                    <div class="download-methods">
+                        <div class="method-card" style="background:#fffbe6;border-left:4px solid #e67e22;margin-bottom:18px;">
+                            <div style="color:#b26a00;font-size:15px;line-height:1.7;">
+                                <b>说明：</b>如遇内网下载带宽已满或不稳定时，可生成外网下载链接。外网下载带宽与内网隔离，互不影响。
                             </div>
-                        </div> `;
-                }
-            });
+                        </div>
+                        <div class="method-card">
+                            <div class="method-title">
+                                <span>🔄 wget 断点续传 - 推荐Linux/Unix系统使用</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-block">
+                                wget -c --tries=5 --retry-connrefused --waitretry=10 --timeout=300 --read-timeout=600 "http://your-server/path/to/file.tar.gz"
+                            </div>
+                        </div>
 
-   window.OnDownload = function(file) {
-       const link = document.createElement('a');
-       link.href = file + '?action=download';
-       link.download = file;
-       document.body.appendChild(link);
-       link.click();
-       document.body.removeChild(link);
-   }
-    // 生成外网下载链接弹窗
-   window.DeleteConfirmDialog = function(fileKey)  {
-        let dialog = document.getElementById('delete_conform_dialog');
-        const filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
-        console.info('DeleteConfirmDialog ', filename, fileKey);
-        if (!dialog) {
-            dialog = document.createElement('div');
-            dialog.id = 'delete_conform_dialog';
-            dialog.innerHTML = `
+                        <div class="method-card">
+                            <div class="method-title">
+                                <span>🚀 curl 标准版 - 支持断点续传，自动提取文件名</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-block">
+                                curl -L -C - -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://your-server/path/to/file.tar.gz"
+                            </div>
+                        </div>
+
+                        <div class="method-card">
+                            <div class="method-title">
+                                <span>💻 Windows CMD 兼容版</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-block">
+                                curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://your-server/path/to/file.tar.gz"
+                            </div>
+                            <div class="method-note">
+                                ✅ Windows CMD完全兼容 | ❌ 不支持断点续传
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="breadcrumb" id="breadcrumb">
+                <span id="breadcrumb-inner"></span>
+                <button id="dirSortBtn" type="button" style="float:right;margin-left:16px;background:none;border:none;color:#3498db;font-size:18px;vertical-align:middle;cursor:pointer;line-height:1;" title="切换目录排序">
+                    <span id="dirSortIcon">↓</span>
+                </button>
+            </div>
+            <div class="file-list" id="fileList">
+                <div class="loading">正在加载...</div>
+            </div>
+        </div>
+
+        <script>
+
+let currentPath = '';
+let currentBasePath = '';
+// 目录倒序状态
+let dirReverse = false;
+
+// 检测当前的基础路径
+function detectBasePath() {
+    const path = window.location.pathname;
+    const basePaths = ['/share', '/data/xpilot']; // 从后端配置动态注入
+    for (const basePath of basePaths) {
+        if (path.startsWith(basePath)) {
+            return basePath;
+        }
+    }
+    return ''; // 根路径
+}
+
+// 初始化基础路径
+currentBasePath = window.location.pathname;
+console.log('Initialized base path:', currentBasePath); // 打印初始化的基础路径
+ShowHideFile  = true
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// 格式化日期
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN');
+}
+
+// 获取文件图标
+function getFileIcon(fileName, isDir) {
+    if (isDir) {
+        return '📁';
+    }
+
+    const ext = fileName.split('.').pop().toLowerCase();
+    const iconMap = {
+        'txt': '📄',
+        'pdf': '📕',
+        'doc': '📘',
+        'docx': '📘',
+        'xls': '📗',
+        'xlsx': '📗',
+        'ppt': '📙',
+        'pptx': '📙',
+        'zip': '📦',
+        'rar': '📦',
+        '7z': '📦',
+        'tar': '📦',
+        'gz': '📦',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️',
+        'gif': '🖼️',
+        'bmp': '🖼️',
+        'mp3': '🎵',
+        'wav': '🎵',
+        'mp4': '🎬',
+        'avi': '🎬',
+        'mov': '🎬'
+    };
+
+    return iconMap[ext] || '📄';
+}
+
+// 从 URL 获取当前路径
+function getCurrentPathFromURL() {
+    let path = window.location.pathname;
+
+    // 如果有基础路径，移除它
+    //if (currentBasePath && path.startsWith(currentBasePath)) {
+    //    path = path.substring(currentBasePath.length);
+    //}
+
+    // 移除开头的 /
+    //if (path.startsWith('/')) {
+    //    path = path.substring(1);
+    //}
+
+    return path;
+}
+
+// 更新 URL 但不刷新页面
+function updateURL(path) {
+    const url = path;
+    window.history.pushState({ path: path }, '', url);
+}
+
+// 更新面包屑导航
+function updateBreadcrumb(path) {
+    const inner = document.getElementById('breadcrumb-inner');
+    let html = `<a href="#" onclick="navigateWithEvent(event, '/')">根目录</a>`;
+    if (path) {
+        const parts = path.split('/').filter(part => part);
+        let currentPathPart = '/';
+        parts.forEach((part, index) => {
+            currentPathPart += part + '/';
+            console.log(`updateBreadcrumb ${currentPathPart}:${part}`);
+            html += ` / <a href=\"#\" onclick=\"navigateWithEvent(event, '${currentPathPart}')\">${part}</a>`;
+        });
+    }
+    inner.innerHTML = html;
+    // 同步按钮图标
+    const icon = document.getElementById('dirSortIcon');
+    if (icon) icon.textContent = dirReverse ? '↑' : '↓';
+}
+
+// 导航到指定路径（带事件处理）
+function navigateWithEvent(event, path) {
+    console.log(`navigateWithEvent path:${path}`);
+    event.preventDefault();
+    navigate(path);
+}
+
+// 导航到指定路径
+function navigate(path) {
+    console.log(`navigate path:${path}`);
+    currentPath = path;
+    updateURL(path);
+    updateBreadcrumb(path);
+    loadFiles(path);
+}
+// 在文件处理函数之前，可以先定义目录处理函数
+function generateDirItemHTML(dir, path) {
+    let dirUrl = path + '/' + dir;
+    dirUrl = dirUrl.replace(/^\/+/, '/');
+
+    if (!dir) return '';
+
+    return `
+        <div class="file-item">
+            <div class="file-icon">${getFileIcon(dir, true)}</div>
+            <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dirUrl}', false)">${dir}/</a>
+            <div class="file-info">
+                <div class="file-size">-</div>
+                <div class="file-date">-</div>
+            </div>
+            <button class="osslink-btn" onclick="DeleteConfirmDialog('${dirUrl}')" title="delete file">
+                <span style="font-size:15px;">🗑️</span>
+            </button>
+        </div>`;
+}
+
+// 文件处理函数（您之前已经拆分的）
+function generateFileItemHTML(file, path) {
+    const fileName = file.key;
+    let fileUrl = path + '/' + fileName;
+    fileUrl = fileUrl.replace(/^\/+/, '/');
+
+    if (!fileName || (fileName.startsWith('.') && !ShowHideFile)) {
+        return '';
+    }
+
+    return `
+        <div class="file-item">
+            <div class="file-icon">${getFileIcon(fileName, false)}</div>
+            <a href="${fileUrl}" class="file-name" target="_blank">${fileName}</a>
+            <div class="file-info">
+                <div class="file-size">${formatFileSize(file.size)}</div>
+                <div class="file-date">${formatDate(file.lastModified)}</div>
+                <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
+                    <span style="font-size:15px;">🗑️</span>
+                </button>
+                <button class="osslink-btn" onclick="OnDownload('${fileUrl}')">
+                    <span style="font-size:15px;">⬇️</span>
+                </button>
+            </div>
+        </div>`;
+}
+
+// 加载文件列表
+async function loadFiles(path) {
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '<div class="loading">正在加载...</div>';
+    // 在加载时显示当前用户
+    const username = sessionStorage.getItem('username');
+    if (username) {
+        console.log(`当前用户: ${username}, 正在加载路径: ${path}`);
+    }
+    console.log(`start ----- loadFiles path:${path}`);
+    try {
+        tmp_url =  path
+        const fetch_url = tmp_url.substring(tmp_url.lastIndexOf('/') + 1);
+        console.log(`loadFiles:${path},fetch_url: ${fetch_url}`);
+        const response = await fetch(path, {method:'PUT'});
+        const data = await response.json();
+
+        if (data.error) {
+            fileList.innerHTML = `<div class="error">错误: ${data.error}</div>`;
+            return;
+        }
+
+        if (data.directories.length === 0 && data.files.length === 0) {
+            fileList.innerHTML = '<div class="empty">此目录为空</div>';
+            return;
+        }
+        // 目录排序（只影响目录，正序/倒序）
+        //let dirs = data.directories.slice();
+
+        let html = '';
+
+        if (dirReverse) {
+            data.directories.forEach(dir => { html += generateDirItemHTML(dir, path); });
+            data.files.forEach(file => { html += generateFileItemHTML(file, path); });
+        } else {
+            data.files.forEach(file => { html += generateFileItemHTML(file, path); });
+            data.directories.forEach(dir => { html += generateDirItemHTML(dir, path); });
+        }
+
+        window.OnDownload = function(file) {
+            const link = document.createElement('a');
+            link.href = file + '?action=download';
+            link.download = file;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        // 生成外网下载链接弹窗
+        window.DeleteConfirmDialog = function(fileKey)  {
+            let dialog = document.getElementById('delete_conform_dialog');
+            const filename = fileKey.substring(fileKey.lastIndexOf('/') + 1);
+            console.info('DeleteConfirmDialog ', filename, fileKey);
+            if (!dialog) {
+                dialog = document.createElement('div');
+                dialog.id = 'delete_conform_dialog';
+                dialog.innerHTML = `
                 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:2000;" onclick="closeOssLinkDialog(event)"></div>
                 <form id="osslink-form" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;padding:32px 24px 24px 24px;border-radius:12px;box-shadow:0 8px 40px rgba(52,152,219,0.18);z-index:2001;min-width:280px;max-width:90vw;">
                     <div style="display:flex;justify-content:center;margin-bottom:16px;margin-top:-8px;">
@@ -872,150 +882,150 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
                     <div id="osslink-result" style="margin-top:16px;color:#2c3e50;"></div>
                 </form>
             `;
-            document.body.appendChild(dialog);
-        }
-       document.getElementById('osslink-form').onsubmit = async function(e) {
+                document.body.appendChild(dialog);
+            }
+            document.getElementById('osslink-form').onsubmit = async function(e) {
                 e.preventDefault();
                 const form = e.target;
                 const resultDiv = document.getElementById('osslink-result');
                 resultDiv.textContent = '正在请求...';
                 fetch(`${fileKey}`, { method: 'DELETE', })
-                .then(response => {
-                    if (response.ok) {
-                        //alert('文件已成功删除！');
-                        resultDiv.textContent = '文件已成功删除！';
-                        if (dialog) {
-                            dialog.style.display = 'none'; // 隐藏弹窗，或使用其他方法移除
+                    .then(response => {
+                        if (response.ok) {
+                            //alert('文件已成功删除！');
+                            resultDiv.textContent = '文件已成功删除！';
+                            if (dialog) {
+                                dialog.style.display = 'none'; // 隐藏弹窗，或使用其他方法移除
+                            }
+                            loadFiles(currentPath);
+                        } else {
+                            alert('删除失败，请稍后重试！');
+                            //resultDiv.textContent = '删除失败，请稍后重试！';
                         }
-                        loadFiles(currentPath);
-                    } else {
-                        alert('删除失败，请稍后重试！');
-                        //resultDiv.textContent = '删除失败，请稍后重试！';
-                    }
-                })
-                .catch(error => {
-                    alert('网络异常，请检查连接！');
-                    //resultDiv.textContent = '网络异常，请检查连接！';
-                });
+                    })
+                    .catch(error => {
+                        alert('网络异常，请检查连接！');
+                        //resultDiv.textContent = '网络异常，请检查连接！';
+                    });
             };
-        // 赋值
-       const filenameElement = document.getElementById('dialog-filename');
-       if (filenameElement) {
-            filenameElement.textContent = `⚠️ Delete ${filename} ?`;
+            // 赋值
+            const filenameElement = document.getElementById('dialog-filename');
+            if (filenameElement) {
+                filenameElement.textContent = `⚠️ Delete ${filename} ?`;
+            }
+            document.getElementById('osslink-result').textContent = '';
+            dialog.style.display = 'block';
         }
-        document.getElementById('osslink-result').textContent = '';
-        dialog.style.display = 'block';
-    }
 
-    window.closeOssLinkDialog = function(e) {
-        if (e && e.target && e.target.id !== 'delete_conform_dialog' && e.target.closest && !e.target.closest('#osslink-form')) {
-            document.getElementById('delete_conform_dialog').style.display = 'none';
-        } else if (!e || (e.target && e.target.type === 'button')) {
-            document.getElementById('delete_conform_dialog').style.display = 'none';
-        }
-    }
-
-                fileList.innerHTML = html;
-            } catch (error) {
-                fileList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+        window.closeOssLinkDialog = function(e) {
+            if (e && e.target && e.target.id !== 'delete_conform_dialog' && e.target.closest && !e.target.closest('#osslink-form')) {
+                document.getElementById('delete_conform_dialog').style.display = 'none';
+            } else if (!e || (e.target && e.target.type === 'button')) {
+                document.getElementById('delete_conform_dialog').style.display = 'none';
             }
         }
 
-        // 处理浏览器前进/后退
-        window.addEventListener('popstate', function(event) {
-            const path = getCurrentPathFromURL();
-            currentPath = path;
-            updateBreadcrumb(path);
-            loadFiles(path);
-        });
+        fileList.innerHTML = html;
+    } catch (error) {
+        fileList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+    }
+}
 
-        // ----------Entry------- 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面加载完成，开始初始化...');
-            
-            // 第一步：立即检查本地存储，快速显示用户名（如果有）
-            checkAndDisplayLoginStatus();
-            
-            // 第二步：设置注销按钮事件监听器
-            setupLogout();
-            
-            // 第三步：异步从后端验证登录状态
-            // 这个会更新本地存储并可能刷新UI
+// 处理浏览器前进/后退
+window.addEventListener('popstate', function(event) {
+    const path = getCurrentPathFromURL();
+    currentPath = path;
+    updateBreadcrumb(path);
+    loadFiles(path);
+});
+
+// ----------Entry------- 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('页面加载完成，开始初始化...');
+
+    // 第一步：立即检查本地存储，快速显示用户名（如果有）
+    checkAndDisplayLoginStatus();
+
+    // 第二步：设置注销按钮事件监听器
+    setupLogout();
+
+    // 第三步：异步从后端验证登录状态
+    // 这个会更新本地存储并可能刷新UI
+    setTimeout(() => {
+        fetchUserInfo();
+    }, 100); // 延迟100ms，确保DOM完全加载
+
+    // 排序按钮事件
+    const sortBtn = document.getElementById('dirSortBtn');
+    if (sortBtn) {
+        sortBtn.onclick = function() {
+            console.log(`onclick sort Btn`);
+            dirReverse = !dirReverse;
+            updateBreadcrumb(currentPath);
+            loadFiles(currentPath);
+        };
+    }
+    const initialPath = getCurrentPathFromURL();
+    console.log(`exec navigate(${initialPath}) `);
+    navigate(initialPath);
+});
+
+// 切换帮助区域显示/隐藏
+function toggleHelp() {
+    const helpDiv = document.getElementById('downloadHelp');
+    const overlay = document.getElementById('overlay');
+
+    if (helpDiv.classList.contains('expanded')) {
+        // 关闭弹窗
+        helpDiv.classList.remove('expanded');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    } else {
+        // 打开弹窗
+        helpDiv.classList.add('expanded');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // 防止页面滚动
+    }
+}
+
+// 复制代码到剪贴板
+function copyCode(button) {
+    // 找到同一个method-card中的代码块
+    const methodCard = button.closest('.method-card');
+    const codeBlock = methodCard.querySelector('.code-block');
+    const code = codeBlock.textContent.trim();
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+            button.textContent = '已复制!';
             setTimeout(() => {
-                fetchUserInfo();
-            }, 100); // 延迟100ms，确保DOM完全加载
-
-            // 排序按钮事件
-            const sortBtn = document.getElementById('dirSortBtn');
-            if (sortBtn) {
-                sortBtn.onclick = function() {
-                    console.log(`onclick sort Btn`);
-                    dirReverse = !dirReverse;
-                    updateBreadcrumb(currentPath);
-                    loadFiles(currentPath);
-                };
-            }
-            const initialPath = getCurrentPathFromURL();
-            console.log(`exec navigate(${initialPath}) `);
-            navigate(initialPath);
+                button.textContent = '复制';
+            }, 2000);
+        }).catch(() => {
+            fallbackCopy(code, button);
         });
+    } else {
+        fallbackCopy(code, button);
+    }
+}
 
-        // 切换帮助区域显示/隐藏
-        function toggleHelp() {
-            const helpDiv = document.getElementById('downloadHelp');
-            const overlay = document.getElementById('overlay');
-
-            if (helpDiv.classList.contains('expanded')) {
-                // 关闭弹窗
-                helpDiv.classList.remove('expanded');
-                overlay.classList.remove('show');
-                document.body.style.overflow = '';
-            } else {
-                // 打开弹窗
-                helpDiv.classList.add('expanded');
-                overlay.classList.add('show');
-                document.body.style.overflow = 'hidden'; // 防止页面滚动
-            }
-        }
-
-        // 复制代码到剪贴板
-        function copyCode(button) {
-            // 找到同一个method-card中的代码块
-            const methodCard = button.closest('.method-card');
-            const codeBlock = methodCard.querySelector('.code-block');
-            const code = codeBlock.textContent.trim();
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(code).then(() => {
-                    button.textContent = '已复制!';
-                    setTimeout(() => {
-                        button.textContent = '复制';
-                    }, 2000);
-                }).catch(() => {
-                    fallbackCopy(code, button);
-                });
-            } else {
-                fallbackCopy(code, button);
-            }
-        }
-
-        // 兼容性复制方案
-        function fallbackCopy(text, button) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                button.textContent = '已复制!';
-                setTimeout(() => {
-                    button.textContent = '复制';
-                }, 2000);
-            } catch (err) {
-                console.error('复制失败:', err);
-            }
-            document.body.removeChild(textArea);
-        }
+// 兼容性复制方案
+function fallbackCopy(text, button) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        button.textContent = '已复制!';
+        setTimeout(() => {
+            button.textContent = '复制';
+        }, 2000);
+    } catch (err) {
+        console.error('复制失败:', err);
+    }
+    document.body.removeChild(textArea);
+}
 //---------upload----
 // 上传相关全局变量
 let selectedFiles = [];
@@ -1032,13 +1042,13 @@ document.getElementById('openUploadModal').onclick = function(e) {
 function openUploadModal() {
     const modal = document.getElementById('uploadModal');
     const uploadPath = document.getElementById('uploadCurrentPath');
-    
+
     // 更新当前路径显示
     uploadPath.textContent = currentPath || '/';
-    
+
     // 重置状态
     resetUploadForm();
-    
+
     // 显示弹窗
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // 防止页面滚动
@@ -1047,7 +1057,7 @@ function openUploadModal() {
 // 关闭上传弹窗
 function closeUploadModal(e) {
     if (e && e.target !== e.currentTarget) return;
-    
+
     const modal = document.getElementById('uploadModal');
     if (uploadInProgress) {
         if (!confirm('上传正在进行中，确定要取消吗？')) {
@@ -1055,7 +1065,7 @@ function closeUploadModal(e) {
         }
         cancelUpload();
     }
-    
+
     modal.style.display = 'none';
     document.body.style.overflow = '';
 }
@@ -1065,7 +1075,7 @@ function resetUploadForm() {
     selectedFiles = [];
     currentUploadIndex = 0;
     uploadInProgress = false;
-    
+
     // 重置UI
     document.getElementById('fileListPreview').style.display = 'none';
     document.getElementById('uploadProgressArea').style.display = 'none';
@@ -1073,7 +1083,7 @@ function resetUploadForm() {
     document.getElementById('uploadResult').style.display = 'none';
     document.getElementById('filePreviewBody').innerHTML = '';
     document.getElementById('fileInput').value = '';
-    
+
     // 重置进度条
     document.getElementById('uploadProgressBar').style.width = '0%';
     document.getElementById('uploadPercentage').textContent = '0%';
@@ -1110,7 +1120,7 @@ function handleDrop(event) {
     event.stopPropagation();
     event.currentTarget.style.borderColor = '#3498db';
     event.currentTarget.style.backgroundColor = '';
-    
+
     const files = Array.from(event.dataTransfer.files);
     addFilesToList(files);
 }
@@ -1121,14 +1131,14 @@ function addFilesToList(files) {
         alert('当前有文件正在上传，请等待完成后再添加新文件。');
         return;
     }
-    
+
     files.forEach(file => {
         // 检查是否已存在同名文件
         if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
             selectedFiles.push(file);
         }
     });
-    
+
     updateFilePreview();
 }
 
@@ -1137,23 +1147,23 @@ function updateFilePreview() {
     const previewBody = document.getElementById('filePreviewBody');
     const fileListPreview = document.getElementById('fileListPreview');
     const uploadBtn = document.getElementById('uploadBtn');
-    
+
     previewBody.innerHTML = '';
-    
+
     if (selectedFiles.length === 0) {
         fileListPreview.style.display = 'none';
         uploadBtn.style.display = 'none';
         return;
     }
-    
+
     fileListPreview.style.display = 'block';
     uploadBtn.style.display = 'block';
-    
+
     let totalSize = 0;
-    
+
     selectedFiles.forEach((file, index) => {
         totalSize += file.size;
-        
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td style="padding:8px;border-bottom:1px solid #f0f0f0;">
@@ -1173,7 +1183,7 @@ function updateFilePreview() {
         `;
         previewBody.appendChild(row);
     });
-    
+
     // 显示总大小
     document.getElementById('totalSize').textContent = formatFileSize(totalSize);
 }
@@ -1184,7 +1194,7 @@ function removeFile(index) {
         alert('上传进行中，无法移除文件。');
         return;
     }
-    
+
     selectedFiles.splice(index, 1);
     updateFilePreview();
 }
@@ -1195,71 +1205,71 @@ async function startUpload() {
         alert('请先选择要上传的文件。');
         return;
     }
-    
+
     uploadInProgress = true;
     const uploadBtn = document.getElementById('uploadBtn');
     uploadBtn.disabled = true;
     uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
-    
+
     // 显示进度区域
     document.getElementById('uploadProgressArea').style.display = 'block';
-    
+
     // 计算总大小
     const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
     let totalUploaded = 0;
-    
+
     // 上传文件
     for (let i = 0; i < selectedFiles.length; i++) {
         currentUploadIndex = i;
         const file = selectedFiles[i];
-        
+
         // 更新当前文件信息
         document.getElementById('currentFileName').textContent = file.name;
-        
+
         // 创建FormData
         const formData = new FormData();
         formData.append('file', file);
-        
+
         // 添加上传路径
         const uploadPath = currentPath || '/';
         formData.append('path', uploadPath);
-        
+
         try {
             // 创建XMLHttpRequest以获取上传进度
             await uploadFileWithProgress(formData, (progress) => {
                 // 单个文件进度
                 document.getElementById('uploadProgressBar').style.width = progress + '%';
                 document.getElementById('uploadPercentage').textContent = Math.round(progress) + '%';
-                
+
                 // 计算已上传大小（这个文件的部分）
                 const fileUploaded = (progress / 100) * file.size;
                 const currentTotalUploaded = totalUploaded + fileUploaded;
-                
+
                 // 整体进度
                 const overallProgress = (currentTotalUploaded / totalSize) * 100;
                 document.getElementById('overallProgressBar').style.width = overallProgress + '%';
                 document.getElementById('overallPercentage').textContent = Math.round(overallProgress) + '%';
                 document.getElementById('uploadedSize').textContent = formatFileSize(currentTotalUploaded);
             });
-            
+
             // 更新已上传总量
             totalUploaded += file.size;
-            
+
         } catch (error) {
             showUploadResult(`文件 "${file.name}" 上传失败: ${error.message}`, 'error');
             break;
         }
     }
-    
+
     // 完成上传
     uploadInProgress = false;
     uploadBtn.disabled = false;
     uploadBtn.innerHTML = '<i class="fas fa-upload"></i> 开始上传';
-    
+
     // 显示成功信息并刷新文件列表
     if (currentUploadIndex === selectedFiles.length - 1) {
         showUploadResult('所有文件上传完成！', 'success');
-        
+
         // 3秒后刷新文件列表
         setTimeout(() => {
             loadFiles(currentPath);
@@ -1272,7 +1282,7 @@ async function startUpload() {
 function uploadFileWithProgress(formData, onProgress) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        
+
         // 监听上传进度
         xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
@@ -1280,7 +1290,7 @@ function uploadFileWithProgress(formData, onProgress) {
                 onProgress(progress);
             }
         });
-        
+
         // 监听完成
         xhr.addEventListener('load', () => {
             if (xhr.status >= 200 && xhr.status < 300) {
@@ -1289,17 +1299,17 @@ function uploadFileWithProgress(formData, onProgress) {
                 reject(new Error(`上传失败: ${xhr.status} ${xhr.statusText}`));
             }
         });
-        
+
         // 监听错误
         xhr.addEventListener('error', () => {
             reject(new Error('网络错误'));
         });
-        
+
         // 监听取消
         xhr.addEventListener('abort', () => {
             reject(new Error('上传已取消'));
         });
-        
+
         // 发送请求
         xhr.open('POST', '/upload'); // 后端API路径
         xhr.send(formData);
@@ -1319,10 +1329,10 @@ function cancelUpload() {
 function showUploadResult(message, type) {
     const resultDiv = document.getElementById('uploadResult');
     resultDiv.style.display = 'block';
-    
+
     let icon = '✅';
     let color = '#27ae60';
-    
+
     if (type === 'error') {
         icon = '❌';
         color = '#e74c3c';
@@ -1330,7 +1340,7 @@ function showUploadResult(message, type) {
         icon = '⚠️';
         color = '#f39c12';
     }
-    
+
     resultDiv.innerHTML = `
         <div style="padding:12px;background:${color}15;border-left:4px solid ${color};border-radius:4px;">
             <div style="display:flex;align-items:center;gap:8px;">
@@ -1340,99 +1350,99 @@ function showUploadResult(message, type) {
         </div>
     `;
 }
-        // ---------- 登录状态管理 ----------
-        
-        // 检查登录状态并显示用户名
-        function checkAndDisplayLoginStatus() {
-            // 从sessionStorage或cookie获取用户名
-            const username = sessionStorage.getItem('username') || getCookie('username');
-            
-            if (username) {
-                // 显示状态栏
-                document.getElementById('statusBar').style.display = 'flex';
-                document.body.classList.add('status-bar-active');
-                
-                // 显示用户名
-                document.getElementById('usernameDisplay').textContent = username;
-                
-            } else {
-                // 隐藏状态栏
-                document.getElementById('statusBar').style.display = 'none';
-                document.body.classList.remove('status-bar-active');
-            }
-        }
-        
-        // 获取Cookie值
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null;
-        }
-        
-        // 注销功能
-        function setupLogout() {
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (confirm('确定要注销吗？')) {
-                        // 清除本地存储的用户信息
-                        sessionStorage.removeItem('username');
-                        localStorage.removeItem('username');
-                        
-                        // 清除相关cookie
-                        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        
-                        // 跳转到后端注销路由
-                        window.location.href = '/logout';
-                    }
-                };
-            }
-        }
-        
-        // 从后端获取用户信息
-        async function fetchUserInfo() {
-            try {
-                const response = await fetch('/api/userinfo', {
-                    method: 'GET',
-                    credentials: 'include' // 包含cookie，确保发送session
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.loggedIn && data.username) {
-                        // 存储用户名到sessionStorage
-                        sessionStorage.setItem('username', data.username);
-                        // 更新UI显示
-                        checkAndDisplayLoginStatus();
-                        console.log('用户信息已从后端获取:', data.username);
-                    } else {
-                        // 用户未登录，清除本地存储
-                        sessionStorage.removeItem('username');
-                        localStorage.removeItem('username');
-                        checkAndDisplayLoginStatus();
-                    }
-                } else if (response.status === 401) {
-                    // 未授权，用户未登录
-                    sessionStorage.removeItem('username');
-                    checkAndDisplayLoginStatus();
-                }
-            } catch (error) {
-                console.log('无法连接到后端获取用户信息:', error);
-                // 如果后端API不可用，使用本地存储的信息
-                const localUsername = sessionStorage.getItem('username');
-                if (localUsername) {
-                    console.log('使用本地存储的用户名:', localUsername);
-                    checkAndDisplayLoginStatus();
-                }
-            }
-        }
+// ---------- 登录状态管理 ----------
 
-    </script>
-</body>
+// 检查登录状态并显示用户名
+function checkAndDisplayLoginStatus() {
+    // 从sessionStorage或cookie获取用户名
+    const username = sessionStorage.getItem('username') || getCookie('username');
+
+    if (username) {
+        // 显示状态栏
+        document.getElementById('statusBar').style.display = 'flex';
+        document.body.classList.add('status-bar-active');
+
+        // 显示用户名
+        document.getElementById('usernameDisplay').textContent = username;
+
+    } else {
+        // 隐藏状态栏
+        document.getElementById('statusBar').style.display = 'none';
+        document.body.classList.remove('status-bar-active');
+    }
+}
+
+// 获取Cookie值
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// 注销功能
+function setupLogout() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (confirm('确定要注销吗？')) {
+                // 清除本地存储的用户信息
+                sessionStorage.removeItem('username');
+                localStorage.removeItem('username');
+
+                // 清除相关cookie
+                document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                // 跳转到后端注销路由
+                window.location.href = '/logout';
+            }
+        };
+    }
+}
+
+// 从后端获取用户信息
+async function fetchUserInfo() {
+    try {
+        const response = await fetch('/api/userinfo', {
+            method: 'GET',
+            credentials: 'include' // 包含cookie，确保发送session
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.loggedIn && data.username) {
+                // 存储用户名到sessionStorage
+                sessionStorage.setItem('username', data.username);
+                // 更新UI显示
+                checkAndDisplayLoginStatus();
+                console.log('用户信息已从后端获取:', data.username);
+            } else {
+                // 用户未登录，清除本地存储
+                sessionStorage.removeItem('username');
+                localStorage.removeItem('username');
+                checkAndDisplayLoginStatus();
+            }
+        } else if (response.status === 401) {
+            // 未授权，用户未登录
+            sessionStorage.removeItem('username');
+            checkAndDisplayLoginStatus();
+        }
+    } catch (error) {
+        console.log('无法连接到后端获取用户信息:', error);
+        // 如果后端API不可用，使用本地存储的信息
+        const localUsername = sessionStorage.getItem('username');
+        if (localUsername) {
+            console.log('使用本地存储的用户名:', localUsername);
+            checkAndDisplayLoginStatus();
+        }
+    }
+}
+
+        </script>
+    </body>
 </html>
 
