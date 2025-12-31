@@ -357,6 +357,98 @@
         padding: 30px 15px;
     }
 }
+
+        /* 状态栏样式 */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .username {
+            font-size: 14px;
+            color: #ecf0f1;
+            font-weight: 500;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .logout-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+        }
+        
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 调整主容器位置，为状态栏留出空间 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        /* 当状态栏显示时，调整容器位置 */
+        body.status-bar-active {
+            padding-top: 60px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .status-bar {
+                padding: 0 15px;
+            }
+            .username {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+            .logout-btn {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+            body.status-bar-active {
+                padding-top: 50px;
+            }
+        }
     </style>
 </head>
 
@@ -457,6 +549,17 @@
 
 
 <body>
+
+    <!-- 顶部状态栏 -->
+    <div id="statusBar" class="status-bar" style="display: none;">
+        <div class="status-left"></div>
+        <div class="status-right">
+            <span id="usernameDisplay" class="username"></span>
+            <button id="logoutBtn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> 注销
+            </button>
+        </div>
+    </div>
 
     <!-- 遮罩层 -->
     <div class="overlay" id="overlay" onclick="toggleHelp()"></div>
@@ -664,6 +767,11 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
         async function loadFiles(path) {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '<div class="loading">正在加载...</div>';
+            // 在加载时显示当前用户
+            const username = sessionStorage.getItem('username');
+            if (username) {
+                console.log(`当前用户: ${username}, 正在加载路径: ${path}`);
+            }
             console.log(`start ----- loadFiles path:${path}`);
             try {
                 tmp_url =  path
@@ -823,6 +931,20 @@ curl -L -O --connect-timeout 60 --max-time 0 --retry 5 --retry-delay 10 "http://
 
         // ----------Entry------- 页面加载时初始化
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化...');
+            
+            // 第一步：立即检查本地存储，快速显示用户名（如果有）
+            checkAndDisplayLoginStatus();
+            
+            // 第二步：设置注销按钮事件监听器
+            setupLogout();
+            
+            // 第三步：异步从后端验证登录状态
+            // 这个会更新本地存储并可能刷新UI
+            setTimeout(() => {
+                fetchUserInfo();
+            }, 100); // 延迟100ms，确保DOM完全加载
+
             // 排序按钮事件
             const sortBtn = document.getElementById('dirSortBtn');
             if (sortBtn) {
@@ -1218,6 +1340,98 @@ function showUploadResult(message, type) {
         </div>
     `;
 }
+        // ---------- 登录状态管理 ----------
+        
+        // 检查登录状态并显示用户名
+        function checkAndDisplayLoginStatus() {
+            // 从sessionStorage或cookie获取用户名
+            const username = sessionStorage.getItem('username') || getCookie('username');
+            
+            if (username) {
+                // 显示状态栏
+                document.getElementById('statusBar').style.display = 'flex';
+                document.body.classList.add('status-bar-active');
+                
+                // 显示用户名
+                document.getElementById('usernameDisplay').textContent = username;
+                
+            } else {
+                // 隐藏状态栏
+                document.getElementById('statusBar').style.display = 'none';
+                document.body.classList.remove('status-bar-active');
+            }
+        }
+        
+        // 获取Cookie值
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+        
+        // 注销功能
+        function setupLogout() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (confirm('确定要注销吗？')) {
+                        // 清除本地存储的用户信息
+                        sessionStorage.removeItem('username');
+                        localStorage.removeItem('username');
+                        
+                        // 清除相关cookie
+                        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        
+                        // 跳转到后端注销路由
+                        window.location.href = '/logout';
+                    }
+                };
+            }
+        }
+        
+        // 从后端获取用户信息
+        async function fetchUserInfo() {
+            try {
+                const response = await fetch('/api/userinfo', {
+                    method: 'GET',
+                    credentials: 'include' // 包含cookie，确保发送session
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.loggedIn && data.username) {
+                        // 存储用户名到sessionStorage
+                        sessionStorage.setItem('username', data.username);
+                        // 更新UI显示
+                        checkAndDisplayLoginStatus();
+                        console.log('用户信息已从后端获取:', data.username);
+                    } else {
+                        // 用户未登录，清除本地存储
+                        sessionStorage.removeItem('username');
+                        localStorage.removeItem('username');
+                        checkAndDisplayLoginStatus();
+                    }
+                } else if (response.status === 401) {
+                    // 未授权，用户未登录
+                    sessionStorage.removeItem('username');
+                    checkAndDisplayLoginStatus();
+                }
+            } catch (error) {
+                console.log('无法连接到后端获取用户信息:', error);
+                // 如果后端API不可用，使用本地存储的信息
+                const localUsername = sessionStorage.getItem('username');
+                if (localUsername) {
+                    console.log('使用本地存储的用户名:', localUsername);
+                    checkAndDisplayLoginStatus();
+                }
+            }
+        }
+
     </script>
 </body>
 </html>

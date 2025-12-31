@@ -240,7 +240,8 @@ def login():
         user = users.get(username)
         if user and check_password_hash(user['password'], password):
             session['username'] = username
-            return redirect(url_for('welcome'))
+            #return render_template('browser.html')
+            return redirect(url_for('web_entry', url_path='/'))
         else:
             return render_template('login.html', error="Invalid username or password")
     return render_template('login.html')
@@ -405,7 +406,18 @@ def upload_batch():
         'failed': len([r for r in results if not r['success']]),
         'results': results
     }), 200
-
+# 添加在您的Flask路由中
+@app.route('/api/userinfo', methods=['GET'])
+def get_userinfo():
+    if 'username' in session:
+        return jsonify({
+            'username': session['username'],
+            'loggedIn': True
+        })
+    return jsonify({
+        'username': None,
+        'loggedIn': False
+    }), 401
 # 获取上传进度（可选，用于更精确的进度控制）
 @app.route('/upload/progress', methods=['GET'])
 def upload_progress():
