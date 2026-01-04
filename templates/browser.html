@@ -1008,17 +1008,26 @@
         updateBreadcrumb(path);
         loadFiles(path);
       }
+      // 定义一个检查是否是root用户的函数
+      function isRootUser() {
+          const username = sessionStorage.getItem('username');
+          return username === 'root';  // 假设您的root用户用户名就是'root'
+      }
       // 目录处理函数
       function generateDirItemHTML(dir, path) {
         let dirUrl = path + "/" + dir.key;
         dirUrl = dirUrl.replace(/^\/+/, "/");
+        // 检查是否是root用户
+        const isRoot = isRootUser();
         return `
         <div class="file-item">
             <div class="file-icon">${getFileIcon(dir.key, true)}</div>
             <a href="#" class="file-name" onclick="navigateWithEvent(event, '${dirUrl}', false)">${dir.key}/</a>
+
+            ${isRoot ? `
             <button class="osslink-btn" onclick="DeleteConfirmDialog('${dirUrl}')" title="delete file">
                 <span style="font-size:15px;">🗑️</span>
-            </button>
+            </button> ` : ''}
             <div class="file-info">
                 <div class="file-size">-</div>
                 <div class="file-date">${formatDate(dir.lastModified)}</div>
@@ -1034,6 +1043,7 @@
         if (!fileName || (fileName.startsWith(".") && !ShowHideFile)) {
           return "";
         }
+        const isRoot = isRootUser();
 
         return `
         <div class="file-item">
@@ -1042,9 +1052,12 @@
             <button class="osslink-btn" onclick="OnDownload('${fileUrl}')">
                 <span style="font-size:15px;">⬇️</span>
             </button>
+
+            ${isRoot ? `
             <button class="osslink-btn" onclick="DeleteConfirmDialog('${fileUrl}')" title="delete file">
                 <span style="font-size:15px;">🗑️</span>
-            </button>
+            </button> ` : ''}
+           
             <div class="file-info">
                 <div class="file-size">${formatFileSize(file.size)}</div>
                 <div class="file-date">${formatDate(file.lastModified)}</div>

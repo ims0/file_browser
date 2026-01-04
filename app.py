@@ -10,13 +10,13 @@ from flask import (
     render_template_string,
     jsonify,
 )
-import json, os, html, logging, shutil, threading
+import json, os, html, logging, shutil
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from werkzeug.utils import secure_filename
-from flask import abort
 from werkzeug.utils import safe_join
 from dotenv import load_dotenv
+from functools import wraps 
 
 app = Flask(__name__)
 
@@ -208,9 +208,20 @@ def move_to_trash(filepath):
         app.logger.error(f"Move to trash failed: {e}")
         return False
 
+# 定义一个需要root权限的装饰器
+def root_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            abort(401)
+        if session.get('username') != 'root':
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 # DELETE处理
 @app.route("/<path:url_path>", methods=["DELETE"])
+@root_required
 def delete_route_api(url_path):
     if "username" not in session:
         abort(401)
@@ -505,7 +516,7 @@ app.config.update(
     SESSION_COOKIE_SECURE=False,  # 生产环境应该为True
     SESSION_COOKIE_HTTPONLY=True,  # 应该启用
     SESSION_COOKIE_SAMESITE="Lax",  # 推荐Lax
-    PERMANENT_SESSION_LIFETIME=3600,  # 1小时过期
+    PERMANENT_SESSION_LIFETIME=36000,  # 10小时过期
 )
 if __name__ == "__main__":
     app.logger.info(f"run")
