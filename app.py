@@ -370,7 +370,7 @@ def file_browser():
 def download_file(filename):
     if "username" not in session:
         abort(401)
-    file_path = secure_path_join(BASE_DIR, filename)
+    file_path = filename
     app.logger.info(f"download_file:{file_path}")
 
     if os.path.isfile(file_path):
