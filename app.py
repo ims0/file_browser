@@ -153,12 +153,20 @@ def data_response_put_api(file_path):
     for entry in os.scandir(dir_path):
         if entry.name.startswith("."):
             continue
-        modify_time = datetime.utcfromtimestamp(entry.stat().st_mtime).isoformat()
-        file_info = {
-            "key": entry.name,
-            "size": entry.stat().st_size,
-            "lastModified": modify_time,
-        }
+        try:
+            # 尝试获取stat信息
+            stat_info = entry.stat()
+            modify_time = datetime.utcfromtimestamp(stat_info.st_mtime).isoformat()
+            file_info = {
+                "key": entry.name,
+                "size": stat_info.st_size,
+                "lastModified": modify_time,
+            }
+        except (OSError, FileNotFoundError) as e:
+            # 处理无效的软链接
+            app.logger.warning(f"continue invalid file: {entry.name}, err: {e}")
+            # 可以选择添加一个标记或跳过
+            continue
         if entry.is_dir():
             directories.append(file_info)
         elif entry.is_file():
